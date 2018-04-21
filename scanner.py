@@ -21,15 +21,15 @@ DIR_TRAVERSAL_PROBES = [
 	"./" + "../" * 7 + "etc/passwd",
 	"./" + "../" * 8 + "etc/passwd",
 	"./" + "../" * 9 + "etc/passwd",
-	".//" + "..//" * 1 + "/etc//passwd",
-	".//" + "..//" * 2 + "/etc//passwd",
-	".//" + "..//" * 3 + "/etc//passwd",
-	".//" + "..//" * 4 + "/etc//passwd",
-	".//" + "..//" * 5 + "/etc//passwd",
-	".//" + "..//" * 6 + "/etc//passwd",
-	".//" + "..//" * 7 + "/etc//passwd",
-	".//" + "..//" * 8 + "/etc//passwd",
-	".//" + "..//" * 9 + "/etc//passwd",
+	".//" + "..//" * 1 + "etc//passwd",
+	".//" + "..//" * 2 + "etc//passwd",
+	".//" + "..//" * 3 + "etc//passwd",
+	".//" + "..//" * 4 + "etc//passwd",
+	".//" + "..//" * 5 + "etc//passwd",
+	".//" + "..//" * 6 + "etc//passwd",
+	".//" + "..//" * 7 + "etc//passwd",
+	".//" + "..//" * 8 + "etc//passwd",
+	".//" + "..//" * 9 + "etc//passwd",
 ]
 
 session = Session()
@@ -45,9 +45,7 @@ def scan(url, params):
 	print("[*] Testing for open redirects")
 	for method in params.keys():
 		method_params = params[method]
-		request = Request(method, url, params=method_params)
-		prepared_request = session.prepare_request(request)
-		response = session.send(prepared_request)
+		response = make_request(method, url, method_params)
 		for history_response in response.history:
 			if 300 <= history_response.status_code < 400:
 				print("[!] Request history contains redirect: %s (%d)" % (history_response.url, history_response.status_code))
@@ -63,9 +61,7 @@ def scan(url, params):
 	print("[*] Testing for unsanitized inputs")
 	for method in params.keys():
 		method_params = params[method]
-		request = Request(method, url, params=method_params)
-		prepared_request = session.prepare_request(request)
-		response = session.send(prepared_request)
+		response = make_request(method, url, method_params)
 		prev_html = response.content
 		first_delta = False
 		for i in range(3):
@@ -79,7 +75,7 @@ def scan(url, params):
 			print("[*] Listing page HTML delta")
 			count = 0
 			for line in delta:
-				print(line)
+				# print(line)
 				count += 1
 			if i == 0 and count > 0:
 				first_delta = True
@@ -92,13 +88,28 @@ def scan(url, params):
 				params_copy = copy.deepcopy(method_params)
 				for probe in DIR_TRAVERSAL_PROBES:
 					params_copy[param] = probe
-					request = Request(method, url, params=params_copy)
-					prepared_request = session.prepare_request(request)
-					response = session.send(prepared_request)
+					response = make_request(method, url, params_copy)
 					if "root:x:0:0" in response.content:
 						print("[!] Found directory traversal indication using parameter value (%s=%s)" % (param, probe))
 						break
 
+		print("[*] Trying SQLi probes")
+		for param in method_params.keys():
+			params_copy = copy.deepcopy(method_params)
+			for probe in SQLI_PROBES:
+				params_copy[param] = probe
+				response = make_request(method, url, params_copy)
+				delta_lines = sum(1 for _ in difflib.context_diff(prev_html, response.content))
+				if delta_lines > 5:
+					print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
+
+def make_request(method, url, params):
+	if method == 'POST':
+		return session.post(url, data=params)
+	elif method == 'GET':
+		return session.get(url, params=params)
+	else:
+		raise ValueError("Unknown method %s" % method)
 
 if __name__ == '__main__':
 	scan('http://192.168.56.101/openredirect/openredirect.php', {'GET': {'redirect': 'success.html'}})
