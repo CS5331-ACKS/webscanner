@@ -94,7 +94,7 @@ def scan(url, params):
 	#Results file
 	json_results = ""
 
- 	'''
+
 	#Command Injection
 	initial_length = ""
 	exploitable = "no"
@@ -257,8 +257,8 @@ def scan(url, params):
 						exploitable = "no" # reset to orignal state
 
 
-'''
 
+	'''
 	# Check for open redirects
 	# ========================
 	# 1. Parameter value is contained in redirected URL
@@ -328,7 +328,7 @@ def scan(url, params):
 				if delta_lines > 5:
 					print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
 					break
-
+'''
 def make_request(method, url, params):
 	if method == 'POST':
 		return session.post(url, data=params)
@@ -340,7 +340,7 @@ def make_request(method, url, params):
 
 if __name__ == '__main__':
 	#scan('http://target.com/openredirect/openredirect.php', {'GET': {'redirect': 'success.html'}})
-	scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
+	#scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
 	#scan('http://target.com/directorytraversal/directorytraversal.php', {'GET': {'ascii': 'angry.ascii'}})
-	#scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8'}})
+	scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8'}})
 	#scan('http://target.com/serverside/serverside.php', {'GET': {'language': 'apples'}})

