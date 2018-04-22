@@ -110,15 +110,15 @@ def scan(url, params):
 						count=+count+1
 						if response.content.find("Linux") != -1: #Need to find a better logic, or change the value on the spot during assesment. Some reverse shell payload will hang the server, need to find a solution for this
 							print("Exploit found!")
-						 	with open('command_injection'+str(count)+'.py', 'w') as exploitFile:
-			 					if method == "POST":
-			 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
-			 						exploitFile.write('response = requests.post("'+url+'",'+str(method_params)+')\n')
-			 						exploitFile.write("print response.content")
-			 					elif method == "GET":
-			 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
-			 						exploitFile.write('response = requests.get("'+url+'",'+str(method_params)+')\n')
-			 						exploitFile.write("print response.content")
+							with open('command_injection'+str(count)+'.py', 'w') as exploitFile:
+								if method == "POST":
+									exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
+									exploitFile.write('response = requests.post("'+url+'",'+str(method_params)+')\n')
+									exploitFile.write("print response.content")
+								elif method == "GET":
+									exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
+									exploitFile.write('response = requests.get("'+url+'",'+str(method_params)+')\n')
+									exploitFile.write("print response.content")
 
 
 
@@ -139,10 +139,10 @@ def scan(url, params):
 			method_params[key] = x.replace("\n", "")
 
 		response = make_request(method, url, method_params)
-	 	print("\nPayload used: " + str(method_params))
-	 	print("Elapsed Time: " + str(response.elapsed.total_seconds()))
+		print("\nPayload used: " + str(method_params))
+		print("Elapsed Time: " + str(response.elapsed.total_seconds()))
 		print("Response content: " + response.content)
-	 	print("Response content length: " + str(response.headers['content-length']))
+		print("Response content length: " + str(response.headers['content-length']))
 
 		delta = int(response.headers['content-length']) - int(initial_length)
 
