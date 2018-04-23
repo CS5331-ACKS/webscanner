@@ -1,20 +1,59 @@
 import requests
 import re
+from Queue import Queue
 from urlparse import urlparse, urljoin
 from pprint import pprint
 from bs4 import BeautifulSoup
 
 REGEX_HTML = re.compile('(text\/html|application\/xhtml\+xml).*')
+STARTING_URL = u'http://192.168.56.101/'
+
+queue = Queue()
+visited_urls = set()
+hostname = ''
+
+discovered_urls = set()
+processed_forms = []
 
 def run():
-  url = 'https://github.com/CS5331-ACKS/webscanner/'
-  url = 'https://jigsaw.w3.org/HTTP/300/302.html'
-  url = 'http://192.168.56.101/'
-  url = 'http://192.168.56.101/sqli/sqli.php'
+  global hostname
 
-  urls, forms = visit(url)
-  pprint(urls)
-  pprint(forms)
+  # Seed the queue
+  queue.put(STARTING_URL)
+  discovered_urls.add(STARTING_URL)
+
+  while not queue.empty():
+    url = queue.get()
+
+    # Check if URL has already been visited
+    if url in visited_urls:
+      continue
+
+    # Check if URL is bounded within the provided hostname
+    host = urlparse(url)
+    current_hostname = host.scheme + '://' + host.netloc
+    if not hostname:
+      hostname = current_hostname
+    elif hostname != current_hostname:
+      continue
+
+    # Visit the URL
+    # TODO what if visit() returns None
+    urls, forms = visit(url)
+    visited_urls.add(url)
+
+    # Enqueue discovered URLs
+    for u in urls:
+      queue.put(u)
+
+    # Store results
+    discovered_urls.update(urls)
+    processed_forms.extend(forms)
+
+  # TODO
+  # dump discovered_urls and processed_forms into a JSON file
+  pprint(discovered_urls)
+  pprint(processed_forms)
 
 '''
 url: string representing a URL
