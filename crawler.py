@@ -11,8 +11,6 @@ STARTING_URL = u'http://192.168.56.101/'
 queue = Queue()
 visited_urls = set()
 hostname = ''
-
-discovered_urls = set()
 processed_forms = []
 
 def run():
@@ -20,7 +18,6 @@ def run():
 
   # Seed the queue
   queue.put(STARTING_URL)
-  discovered_urls.add(STARTING_URL)
 
   while not queue.empty():
     url = queue.get()
@@ -41,22 +38,21 @@ def run():
 
     # Visit the URL
     results = visit(url)
+    visited_urls.add(url)
     if results is None:
       continue
     urls, forms = results
-    visited_urls.add(url)
 
     # Enqueue discovered URLs
     for u in urls:
       queue.put(u)
 
     # Store results
-    discovered_urls.update(urls)
     processed_forms.extend(forms)
 
   # TODO
-  # dump discovered_urls and processed_forms into a JSON file
-  pprint(discovered_urls)
+  # dump visited_urls and processed_forms into a JSON file
+  pprint(visited_urls)
   pprint(processed_forms)
 
 '''
@@ -80,6 +76,10 @@ def visit(url, method='GET', params={}):
   except requests.exceptions.RequestException as e:
     print('Connection error: ' + r.url)
     return None
+
+  # Detect redirects
+  if url != r.url:
+    visited_urls.add(r.url)
 
   # Check if content-type is html
   if REGEX_HTML.match(r.headers['content-type']) is None:
