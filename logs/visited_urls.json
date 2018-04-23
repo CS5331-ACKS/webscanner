@@ -1,0 +1,18 @@
+[
+  "http://192.168.56.101/openredirect/success.html",
+  "http://192.168.56.101",
+  "http://192.168.56.101/sqli/sqli.php",
+  "http://192.168.56.101/commandinjection/commandinjection.php",
+  "http://192.168.56.101/serverside/serverside.php?page=bananas",
+  "http://192.168.56.101/directorytraversal/directorytraversal.php?ascii=angry.ascii",
+  "http://192.168.56.101/serverside/serverside.php?page=apples",
+  "http://192.168.56.101/directorytraversal/directorytraversal.php?ascii=stretch.ascii",
+  "http://192.168.56.101/directorytraversal/cats.html",
+  "http://192.168.56.101/directorytraversal/directorytraversal.php?ascii=fence.ascii",
+  "http://192.168.56.101/serverside/serverside.php",
+  "http://192.168.56.101/openredirect/openredirect.php?redirect=success.html",
+  "http://192.168.56.101/csrf/csrf.php",
+  "http://192.168.56.101/serverside/serverside.php?page=oranges",
+  "http://192.168.56.101/",
+  "http://192.168.56.101/openredirect/openredirect.html"
+]

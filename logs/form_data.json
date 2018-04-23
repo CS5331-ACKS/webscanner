@@ -1,0 +1,50 @@
+[
+  {
+    "_fields": [
+      {
+        "name": "host",
+        "type": "text",
+        "value": "google.com"
+      },
+      {
+        "type": "submit"
+      }
+    ],
+    "_url": "http://192.168.56.101/commandinjection/commandinjection.php",
+    "id": "rce",
+    "method": "POST"
+  },
+  {
+    "_fields": [
+      {
+        "name": "secret",
+        "type": "text",
+        "value": "SECRET"
+      },
+      {
+        "name": "csrftoken",
+        "type": "hidden",
+        "value": "abcdef1235"
+      },
+      {
+        "type": "submit"
+      }
+    ],
+    "_url": "http://192.168.56.101/csrf/csrf.php",
+    "method": "POST"
+  },
+  {
+    "_fields": [
+      {
+        "name": "username",
+        "type": "text"
+      },
+      {
+        "type": "submit"
+      }
+    ],
+    "_url": "http://192.168.56.101/sqli/sqli.php",
+    "id": "directory",
+    "method": "POST"
+  }
+]

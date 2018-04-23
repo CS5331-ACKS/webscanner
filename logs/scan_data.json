@@ -1,0 +1,83 @@
+[
+  {
+    "params": {
+      "POST": {
+        "host": "google.com"
+      }
+    },
+    "url": "http://192.168.56.101/commandinjection/commandinjection.php"
+  },
+  {
+    "params": {
+      "POST": {
+        "csrftoken": "abcdef1235",
+        "secret": "SECRET"
+      }
+    },
+    "url": "http://192.168.56.101/csrf/csrf.php"
+  },
+  {
+    "params": {
+      "POST": {
+        "username": null
+      }
+    },
+    "url": "http://192.168.56.101/sqli/sqli.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "ascii": "angry.ascii"
+      }
+    },
+    "url": "http://192.168.56.101/directorytraversal/directorytraversal.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "ascii": "stretch.ascii"
+      }
+    },
+    "url": "http://192.168.56.101/directorytraversal/directorytraversal.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "ascii": "fence.ascii"
+      }
+    },
+    "url": "http://192.168.56.101/directorytraversal/directorytraversal.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "page": "bananas"
+      }
+    },
+    "url": "http://192.168.56.101/serverside/serverside.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "page": "oranges"
+      }
+    },
+    "url": "http://192.168.56.101/serverside/serverside.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "page": "apples"
+      }
+    },
+    "url": "http://192.168.56.101/serverside/serverside.php"
+  },
+  {
+    "params": {
+      "GET": {
+        "redirect": "success.html"
+      }
+    },
+    "url": "http://192.168.56.101/openredirect/openredirect.php"
+  }
+]
