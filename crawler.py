@@ -9,14 +9,20 @@ REGEX_HTML = re.compile('(text\/html|application\/xhtml\+xml).*')
 def run():
   url = 'https://github.com/CS5331-ACKS/webscanner/'
   url = 'https://jigsaw.w3.org/HTTP/300/302.html'
+  url = 'http://192.168.56.101/'
+  url = 'http://192.168.56.101/sqli/sqli.php'
 
-  urls = visit(url)
+  urls, forms = visit(url)
   pprint(urls)
+  pprint(forms)
 
 '''
 url: string representing a URL
-if host responds with a HTML document, returns a set of processed URLs in the document
-else returns None
+
+if host responds with a HTML document:
+  returns a tuple containing (set of processed URLs, list of form dicts)
+else:
+  returns None
 '''
 def visit(url, method='GET', params={}):
   # Initiate connection, defer downloading of response body
@@ -49,10 +55,11 @@ def visit(url, method='GET', params={}):
   html = r.text
   r.close()
 
-  # Parse HTML and look for <a> tags
+  # Parse HTML
   soup = BeautifulSoup(html, 'html.parser')
-  urls = set()
 
+  # Process <a> tags
+  urls = set()
   for a in soup.find_all('a'):
     link = a.get('href')
     if link is None:
@@ -68,7 +75,15 @@ def visit(url, method='GET', params={}):
       # link is a relative url
       urls.add(urljoin(host.geturl(), link.geturl()))
 
-  return urls
+  # Process <form> tags and their children <input> tags
+  forms = []
+  for form in soup.find_all('form'):
+    form_data = form.attrs
+    form_data[u'_fields'] = map(lambda input: input.attrs, form.find_all('input'))
+    form_data[u'_url'] = r.url
+    forms.append(form_data)
+
+  return (urls, forms)
 
 if __name__ == '__main__':
   run()
