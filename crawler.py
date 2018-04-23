@@ -27,6 +27,7 @@ def run():
 
     # Check if URL has already been visited
     if url in visited_urls:
+      print('URL already visited: ' + url)
       continue
 
     # Check if URL is bounded within the provided hostname
@@ -35,11 +36,14 @@ def run():
     if not hostname:
       hostname = current_hostname
     elif hostname != current_hostname:
+      print('URL outside of domain scope: ' + url)
       continue
 
     # Visit the URL
-    # TODO what if visit() returns None
-    urls, forms = visit(url)
+    results = visit(url)
+    if results is None:
+      continue
+    urls, forms = results
     visited_urls.add(url)
 
     # Enqueue discovered URLs
@@ -74,19 +78,19 @@ def visit(url, method='GET', params={}):
       print('Invalid HTTP method')
       return None
   except requests.exceptions.RequestException as e:
-    print('Connection error')
+    print('Connection error: ' + r.url)
     return None
 
   # Check if content-type is html
   if REGEX_HTML.match(r.headers['content-type']) is None:
-    print('Content-type is not html')
+    print('Content-type is not html: ' + r.url)
     r.close()
     return None
 
   # Parse from host url
   host = urlparse(r.url)
   if host.scheme != 'http' and host.scheme != 'https':
-    print('Host is not http or https')
+    print('Host is not http or https: ' + r.url)
     r.close()
     return None
 
