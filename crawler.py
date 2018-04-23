@@ -19,10 +19,16 @@ url: string representing a URL
 if host responds with a HTML document, returns a list of processed URLs in the document
 else returns None
 '''
-def visit(url):
+def visit(url, method='GET', params={}):
   # Initiate connection, defer downloading of response body
   try:
-    r = requests.get(url, stream=True)
+    if method == 'POST':
+      r = requests.post(url, data=params, stream=True)
+    elif method == 'GET':
+      r = requests.get(url, params=params, stream=True)
+    else:
+      print('Invalid HTTP method')
+      return None
   except requests.exceptions.RequestException as e:
     print('Connection error')
     return None
