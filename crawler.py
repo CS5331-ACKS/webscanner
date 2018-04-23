@@ -22,16 +22,19 @@ def visit(url):
   try:
     r = requests.get(url, stream=True)
   except requests.exceptions.RequestException as e:
+    print('Connection error')
     return None
 
   # Check if content-type is html
   if REGEX_HTML.match(r.headers['content-type']) is None:
+    print('Content-type is not html')
     r.close()
     return None
 
   # Extract domain from host url
   matches = REGEX_HOST.match(r.url)
   if matches is None:
+    print('Host is not http or https')
     r.close()
     return None
 
