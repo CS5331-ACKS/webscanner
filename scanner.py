@@ -135,7 +135,7 @@ def scan(url, params):
 				#sleep command is 10 seconds
 				elif response.elapsed.total_seconds() > 10:
 					print "[*]Module is potentially vulnerable to blind command injection!"
-					exploitable = "yes"
+					command_inj_exploitable = "yes"
 					with open('results.txt', 'a') as result:
 						result.write(json.dumps({ "class":"Command Injection", "results":{ hostname:[ { "endpoint":endpoint, "params": method_params , "method": method }] } }) + '\n')
 					break
@@ -393,4 +393,4 @@ if __name__ == '__main__':
 	#scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
 	#scan('http://target.com/directorytraversal/directorytraversal.php', {'GET': {'ascii': 'angry.ascii'}})
 	scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8','domain': '8.8.8.8'}})
-	#scan('http://target.com/serverside/serverside.php', {'GET': {'language': 'apples'}})
+	scan('http://target.com/serverside/serverside.php', {'GET': {'language': 'apples'}})
