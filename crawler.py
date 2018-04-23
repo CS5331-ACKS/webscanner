@@ -1,13 +1,15 @@
 import requests
 import re
+from urlparse import urlparse, urljoin
 from pprint import pprint
 from bs4 import BeautifulSoup
 
 REGEX_HTML = re.compile('(text\/html|application\/xhtml\+xml).*')
-REGEX_HOST = re.compile('http(|s):\/\/.+?\/')
 
 def run():
   url = 'https://github.com/CS5331-ACKS/webscanner/'
+  url = 'https://jigsaw.w3.org/HTTP/300/302.html'
+
   urls = visit(url)
   pprint(urls)
 
@@ -31,15 +33,14 @@ def visit(url):
     r.close()
     return None
 
-  # Extract domain from host url
-  matches = REGEX_HOST.match(r.url)
-  if matches is None:
+  # Parse from host url
+  host = urlparse(r.url)
+  if host.scheme != 'http' and host.scheme != 'https':
     print('Host is not http or https')
     r.close()
     return None
 
   # Get response content
-  domain = matches.group(0)
   html = r.text
   r.close()
 
@@ -49,13 +50,18 @@ def visit(url):
 
   for a in soup.find_all('a'):
     link = a.get('href')
-
     if link is None:
       continue
-    elif link.startswith('/'):
-      urls.append(domain + link[1:])
-    elif link.lower().startswith('http://') or link.lower().startswith('https://'):
-      urls.append(link)
+
+    link = urlparse(link)
+    if link.netloc:
+      # don't change the link, unless the scheme is missing
+      if not link.scheme:
+        link = link._replace(scheme = host.scheme)
+      urls.append(link.geturl())
+    else:
+      # link is a relative url
+      urls.append(urljoin(host.geturl(), link.geturl()))
 
   return urls
 
