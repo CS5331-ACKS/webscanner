@@ -2,49 +2,49 @@
   {
     "_fields": [
       {
-        "type": "text",
         "name": "host",
+        "type": "text",
         "value": "google.com"
       },
       {
         "type": "submit"
       }
     ],
-    "id": "rce",
     "_url": "http://192.168.56.101/commandinjection/commandinjection.php",
+    "id": "rce",
     "method": "POST"
   },
   {
     "_fields": [
       {
-        "type": "text",
         "name": "secret",
+        "type": "text",
         "value": "SECRET"
       },
       {
-        "type": "hidden",
         "name": "csrftoken",
+        "type": "hidden",
         "value": "abcdef1235"
       },
       {
         "type": "submit"
       }
     ],
-    "method": "POST",
-    "_url": "http://192.168.56.101/csrf/csrf.php"
+    "_url": "http://192.168.56.101/csrf/csrf.php",
+    "method": "POST"
   },
   {
     "_fields": [
       {
-        "type": "text",
-        "name": "username"
+        "name": "username",
+        "type": "text"
       },
       {
         "type": "submit"
       }
     ],
-    "id": "directory",
     "_url": "http://192.168.56.101/sqli/sqli.php",
+    "id": "directory",
     "method": "POST"
   }
 ]

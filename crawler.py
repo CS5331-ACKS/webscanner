@@ -57,10 +57,10 @@ def run():
   pprint(visited_urls)
   pprint(processed_forms)
   with open(VISITED_URLS_FILE, 'w') as outfile:
-    json.dump(list(visited_urls), outfile, indent=2, separators=(',', ': '))
+    json.dump(list(visited_urls), outfile, indent=2, separators=(',', ': '), sort_keys=True)
     outfile.write("\n")
   with open(PROCESSED_FORMS_FILE, 'w') as outfile:
-    json.dump(processed_forms, outfile, indent=2, separators=(',', ': '))
+    json.dump(processed_forms, outfile, indent=2, separators=(',', ': '), sort_keys=True)
     outfile.write("\n")
 
 '''
