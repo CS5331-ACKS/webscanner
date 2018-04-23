@@ -1,4 +1,4 @@
 <?php
-$last_line = system('echo vq3rio13dj8x');
+$last_line = system('cat /etc/passwd');
 echo $last_line
 ?>

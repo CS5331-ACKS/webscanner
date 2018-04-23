@@ -15,7 +15,6 @@ def run():
 
 '''
 url: string representing a URL
-
 if host responds with a HTML document, returns a set of processed URLs in the document
 else returns None
 '''

