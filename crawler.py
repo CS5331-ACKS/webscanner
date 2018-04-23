@@ -82,7 +82,7 @@ def visit(url, method='GET', params={}):
       print('Invalid HTTP method')
       return None
   except requests.exceptions.RequestException as e:
-    print('Connection error: ' + r.url)
+    print('Connection error: ' + url)
     return None
 
   # Detect redirects
