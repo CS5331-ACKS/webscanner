@@ -1,5 +1,6 @@
 import requests
 import re
+import json
 from Queue import Queue
 from urlparse import urlparse, urljoin
 from pprint import pprint
@@ -7,6 +8,8 @@ from bs4 import BeautifulSoup
 
 REGEX_HTML = re.compile('(text\/html|application\/xhtml\+xml).*')
 STARTING_URL = u'http://192.168.56.101/'
+VISITED_URLS_FILE = 'visited_urls.json'
+PROCESSED_FORMS_FILE = 'form_data.json'
 
 queue = Queue()
 visited_urls = set()
@@ -50,10 +53,15 @@ def run():
     # Store results
     processed_forms.extend(forms)
 
-  # TODO
-  # dump visited_urls and processed_forms into a JSON file
+  # Write visited_urls and processed_forms into separate JSON files
   pprint(visited_urls)
   pprint(processed_forms)
+  with open(VISITED_URLS_FILE, 'w') as outfile:
+    json.dump(list(visited_urls), outfile, indent=2, separators=(',', ': '))
+    outfile.write("\n")
+  with open(PROCESSED_FORMS_FILE, 'w') as outfile:
+    json.dump(processed_forms, outfile, indent=2, separators=(',', ': '))
+    outfile.write("\n")
 
 '''
 url: string representing a URL
