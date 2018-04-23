@@ -16,7 +16,7 @@ def run():
 '''
 url: string representing a URL
 
-if host responds with a HTML document, returns a list of processed URLs in the document
+if host responds with a HTML document, returns a set of processed URLs in the document
 else returns None
 '''
 def visit(url, method='GET', params={}):
@@ -52,7 +52,7 @@ def visit(url, method='GET', params={}):
 
   # Parse HTML and look for <a> tags
   soup = BeautifulSoup(html, 'html.parser')
-  urls = []
+  urls = set()
 
   for a in soup.find_all('a'):
     link = a.get('href')
@@ -64,10 +64,10 @@ def visit(url, method='GET', params={}):
       # don't change the link, unless the scheme is missing
       if not link.scheme:
         link = link._replace(scheme = host.scheme)
-      urls.append(link.geturl())
+      urls.add(link.geturl())
     else:
       # link is a relative url
-      urls.append(urljoin(host.geturl(), link.geturl()))
+      urls.add(urljoin(host.geturl(), link.geturl()))
 
   return urls
 
