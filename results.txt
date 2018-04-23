@@ -1,2 +1,2 @@
-{"class": "SQL Injection", "results": {"http://target.com": [{"endpoint": "/openredirect/openredirect.php", "params": {"redirect": "' OR SLEEP(3);#"}, "method": "GET"}]}}
-{"class": "SQL Injection", "results": {"http://target.com": [{"endpoint": "/sqli/sqli.php", "params": {"username": "' OR SLEEP(3);#"}, "method": "POST"}]}}
+{"class": "Command Injection", "results": {"http://192.168.56.101": [{"endpoint": "/commandinjection/commandinjection.php", "params": {"host": ";id"}, "method": "POST"}]}}
+{"class": "Command Injection", "results": {"http://192.168.56.101": [{"endpoint": "/commandinjection/commandinjection.php", "params": {"host": ";id"}, "method": "POST"}]}}

