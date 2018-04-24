@@ -43,7 +43,8 @@ CONFIG_TO_SCAN = {
 CONFIG_USE_FIREFOX = True
 CONFIG_REDIR_WAIT = 6
 
-COOKIE_HTTP_HEADER = {'Cookie': 'testcookie'}
+cookie_data = open('cookie.txt', 'r').read().strip()
+COOKIE_HTTP_HEADER = {'Cookie': cookie_data}
 
 CONFIG_SQLI_SLEEP_TIME = 5
 
