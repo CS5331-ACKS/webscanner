@@ -1,0 +1,19 @@
+[
+  {
+    "params": {
+      "POST": {
+        "target": null,
+        "count": "3333333333333333333%7cecho%20m7pl2eqk1g%20qqbr32n6ib%7c%7ca%20%23'%20%7cecho%20m7pl2eqk1g%20qqbr32n6ib%7c%7ca%20%23%7c%22%20%7cecho%20m7pl2eqk1g%20qqbr32n6ib%7c%7ca%20%23"
+      }
+    },
+    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8081/secretclub.php?page=science",
+    "scan_config": {
+      "SQL Injection": false,
+    	"Server Side Code Injection": false,
+    	"Directory Traversal": false,
+    	"Open Redirect": false,
+    	"CSRF": false,
+    	"Command Injection": true
+    }
+  }
+]

@@ -1,1 +1,1 @@
-PHPSESSID=o3ebft2aedcdgb49ka0onkr9q2; session=eyJ1c2VyIjoidG9taGFua3MifQ.DcDA6w.g8LWdCXPLiZrLOEbEU59LEaUPFk
+PHPSESSID=o3ebft2aedcdgb49ka0onkr9q2

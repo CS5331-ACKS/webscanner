@@ -5,7 +5,17 @@
   },
   "Open Redirect": {
     "class": "Open Redirect",
-    "results": {}
+    "results": {
+      "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8081": [
+        {
+          "endpoint": "/secretclub.php",
+          "params": {
+            "page": "drinks#http://www.google.com"
+          },
+          "method": "GET"
+        }
+      ]
+    }
   },
   "Command Injection": {
     "class": "Command Injection",
@@ -17,18 +27,7 @@
   },
   "CSRF": {
     "class": "CSRF",
-    "results": {
-      "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8082": [
-        {
-          "endpoint": "/posts/new",
-          "params": {
-            "body": "test body",
-            "title": "test title"
-          },
-          "method": "POST"
-        }
-      ]
-    }
+    "results": {}
   },
   "Directory Traversal": {
     "class": "Directory Traversal",

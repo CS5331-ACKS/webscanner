@@ -284,9 +284,11 @@ def scan(url, params):
 				options = Options()
 				options.set_headless(headless=True)
 				firefox = webdriver.Firefox(firefox_options=options)
+				request_url = request_url.replace('%23', '#').replace('%3A', ':').replace('%2F', '/')
 				firefox.get(request_url)
 				print("[*] Waiting for preconfigured time: %ds" % CONFIG_REDIR_WAIT)
 				time.sleep(CONFIG_REDIR_WAIT)
+				print("[*] Destination URL: %s" % firefox.current_url)
 				for param, value in method_params.items():
 					if value in firefox.current_url:
 						print("[!] Redirected URL path contains parameter value (%s=%s)" % (param, value))
