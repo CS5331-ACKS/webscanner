@@ -34,7 +34,7 @@ RESULTS = {result_key: {"class": result_key, "results": {}} for result_key in RE
 CONFIG_TO_SCAN = {
 	RESULT_KEY_SQLI: False,
 	RESULT_KEY_SSCI: False,
-	RESULT_KEY_DIR: True,
+	RESULT_KEY_DIR: False,
 	RESULT_KEY_REDIR: False,
 	RESULT_KEY_CSRF: False,
 	RESULT_KEY_CMD: False
@@ -400,6 +400,11 @@ if __name__ == '__main__':
 		with open(sys.argv[1], 'r') as file:
 			scan_data_list = json.loads(file.read())
 			for scan_data in scan_data_list:
+				scan_config = scan_data.get('scan_config') or {}
+				print(scan_config)
+				for result_key in scan_config.keys():
+					if result_key in CONFIG_TO_SCAN.keys():
+						CONFIG_TO_SCAN[result_key] = scan_config[result_key]
 				scan(scan_data['url'], scan_data['params'])
 
 		print('\nScan Results')

@@ -5,6 +5,14 @@
         "target": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/adventure/"
       }
     },
-    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/princess.php"
+    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/princess.php",
+    "scan_config": {
+      "SQL Injection": false,
+    	"Server Side Code Injection": false,
+    	"Directory Traversal": false,
+    	"Open Redirect": true,
+    	"CSRF": false,
+    	"Command Injection": false
+    }
   }
 ]
