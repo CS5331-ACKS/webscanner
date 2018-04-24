@@ -11,7 +11,8 @@ from urlparse import urlparse
 
 ### Scanner configuration and probes ###
 
-COOKIE_HTTP_HEADER = {'Cookie': 'testcookie'}
+cookie_data = open('cookie.txt', 'r').read().strip()
+COOKIE_HTTP_HEADER = {'Cookie': cookie_data}
 
 CONFIG_SQLI_SLEEP_TIME = 3
 
