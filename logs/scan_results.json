@@ -17,20 +17,21 @@
   },
   "CSRF": {
     "class": "CSRF",
-    "results": {}
-  },
-  "Directory Traversal": {
-    "class": "Directory Traversal",
     "results": {
       "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8082": [
         {
-          "endpoint": "/file",
+          "endpoint": "/posts/new",
           "params": {
-            "filename": "./../etc/passwd"
+            "body": "test body",
+            "title": "test title"
           },
-          "method": "GET"
+          "method": "POST"
         }
       ]
     }
+  },
+  "Directory Traversal": {
+    "class": "Directory Traversal",
+    "results": {}
   }
 }

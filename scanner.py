@@ -6,7 +6,6 @@ import os
 import requests
 import sys
 import time
-import urllib
 from copy import deepcopy
 from requests import Request, Session
 from pprint import pprint
@@ -50,7 +49,6 @@ COOKIE_HTTP_HEADER = {'Cookie': cookie_data}
 CONFIG_SQLI_SLEEP_TIME = 5
 
 SQLI_PROBES = [
-	"-3870 UNION ALL SELECT 3406,3406,(SELECT CONCAT(0x10,IFNULL(CAST(grantee AS CHAR),0x20),0x10) FROM INFORMATION_SCHEMA.USER_PRIVILEGES LIMIT 1,1),3406,3406--",
 	"(select*from(select(sleep(%d)))a)" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR SLEEP(%d);#" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR SLEEP(%d);--" % CONFIG_SQLI_SLEEP_TIME,
@@ -133,7 +131,7 @@ def scan(url, params):
 			auth_response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
 			unauth_response = make_request(method, url, method_params, {'Referer': 'https://www.google.com'})
 			# This checks for the case where the CSRF token is a secret cookie (bad implementation)
-			if auth_response.content == unauth_response.content:
+			if auth_response.content != unauth_response.content:
 				print("[!] Authenticated and unauthenticated request produces identical responses")
 				print("[*] Note: Ignore unauthenticated only requests as this test case produces false positives")
 				add_result(RESULT_KEY_CSRF, hostname, endpoint, method_params, method)
@@ -286,19 +284,12 @@ def scan(url, params):
 				options = Options()
 				options.set_headless(headless=True)
 				firefox = webdriver.Firefox(firefox_options=options)
-				# URL decode the URL manually
-				request_url = request_url.replace('%23', '#').replace('%3A', ':').replace('%2F', '/')
-				print("[*] Request URL: %s" % request_url)
 				firefox.get(request_url)
 				print("[*] Waiting for preconfigured time: %ds" % CONFIG_REDIR_WAIT)
 				time.sleep(CONFIG_REDIR_WAIT)
-				print("[*] Destination URL: %s" % firefox.current_url)
 				for param, value in method_params.items():
 					if value in firefox.current_url:
 						print("[!] Redirected URL path contains parameter value (%s=%s)" % (param, value))
-						add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
-					elif value.endswith(firefox.current_url):
-						print("[!] Redirected URL is part of parameter value (%s=%s)" % (param, value))
 						add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
 				firefox.quit()
 

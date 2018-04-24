@@ -1,0 +1,17 @@
+[
+  {
+    "params": {
+      "GET": {
+      }
+    },
+    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8082/picturise/date",
+    "scan_config": {
+      "SQL Injection": false,
+    	"Server Side Code Injection": false,
+    	"Directory Traversal": false,
+    	"Open Redirect": false,
+    	"CSRF": false,
+    	"Command Injection": true
+    }
+  }
+]
