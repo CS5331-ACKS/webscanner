@@ -1,0 +1,18 @@
+[
+  {
+    "params": {
+      "GET": {
+        "page": "drinks#http://www.google.com"
+      }
+    },
+    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8081/secretclub.php",
+    "scan_config": {
+      "SQL Injection": false,
+    	"Server Side Code Injection": false,
+    	"Directory Traversal": false,
+    	"Open Redirect": true,
+    	"CSRF": false,
+    	"Command Injection": false
+    }
+  }
+]

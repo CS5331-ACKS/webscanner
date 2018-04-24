@@ -6,6 +6,7 @@ import os
 import requests
 import sys
 import time
+import urllib
 from copy import deepcopy
 from requests import Request, Session
 from pprint import pprint
@@ -285,12 +286,19 @@ def scan(url, params):
 				options = Options()
 				options.set_headless(headless=True)
 				firefox = webdriver.Firefox(firefox_options=options)
+				# URL decode the URL manually
+				request_url = request_url.replace('%23', '#').replace('%3A', ':').replace('%2F', '/')
+				print("[*] Request URL: %s" % request_url)
 				firefox.get(request_url)
 				print("[*] Waiting for preconfigured time: %ds" % CONFIG_REDIR_WAIT)
 				time.sleep(CONFIG_REDIR_WAIT)
+				print("[*] Destination URL: %s" % firefox.current_url)
 				for param, value in method_params.items():
 					if value in firefox.current_url:
 						print("[!] Redirected URL path contains parameter value (%s=%s)" % (param, value))
+						add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
+					elif value.endswith(firefox.current_url):
+						print("[!] Redirected URL is part of parameter value (%s=%s)" % (param, value))
 						add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
 				firefox.quit()
 
