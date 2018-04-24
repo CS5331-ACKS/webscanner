@@ -12,7 +12,7 @@ VISITED_URLS_FILE = 'logs/visited_urls.json'
 PROCESSED_FORMS_FILE = 'logs/form_data.json'
 SCAN_DATA_FILE = 'logs/scan_data.json'
 
-cookie_data = open('test.txt', 'r').read()
+cookie_data = open('cookie.txt', 'r').read().strip()
 COOKIE = {'Cookie': cookie_data}
 
 queue = Queue()
