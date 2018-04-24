@@ -34,8 +34,8 @@ RESULTS = {result_key: {"class": result_key, "results": {}} for result_key in RE
 CONFIG_TO_SCAN = {
 	RESULT_KEY_SQLI: False,
 	RESULT_KEY_SSCI: False,
-	RESULT_KEY_DIR: False,
-	RESULT_KEY_REDIR: True,
+	RESULT_KEY_DIR: True,
+	RESULT_KEY_REDIR: False,
 	RESULT_KEY_CSRF: False,
 	RESULT_KEY_CMD: False
 }

@@ -1,0 +1,10 @@
+[
+  {
+    "params": {
+      "GET": {
+        "princess": "/etc/passwd"
+      }
+    },
+    "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/adventure/boogle/googla/peach/"
+  }
+]

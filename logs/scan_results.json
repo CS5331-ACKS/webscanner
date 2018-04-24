@@ -5,17 +5,7 @@
   },
   "Open Redirect": {
     "class": "Open Redirect",
-    "results": {
-      "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080": [
-        {
-          "endpoint": "/princess.php",
-          "params": {
-            "target": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/adventure/"
-          },
-          "method": "GET"
-        }
-      ]
-    }
+    "results": {}
   },
   "Command Injection": {
     "class": "Command Injection",
@@ -31,6 +21,16 @@
   },
   "Directory Traversal": {
     "class": "Directory Traversal",
-    "results": {}
+    "results": {
+      "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080": [
+        {
+          "endpoint": "/adventure/boogle/googla/peach/",
+          "params": {
+            "princess": "./../../../../../../../etc/passwd"
+          },
+          "method": "GET"
+        }
+      ]
+    }
   }
 }
