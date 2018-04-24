@@ -12,6 +12,9 @@ VISITED_URLS_FILE = 'logs/visited_urls.json'
 PROCESSED_FORMS_FILE = 'logs/form_data.json'
 SCAN_DATA_FILE = 'logs/scan_data.json'
 
+cookie_data = open('test.txt', 'r').read()
+COOKIE = {'Cookie': cookie_data}
+
 queue = Queue()
 visited_urls = set()
 hostname = ''
@@ -88,9 +91,9 @@ def visit(url, method='GET', params={}):
 	# Initiate connection, defer downloading of response body
 	try:
 		if method == 'POST':
-			r = requests.post(url, data=params, stream=True)
+			r = requests.post(url, data=params, stream=True, headers=COOKIE)
 		elif method == 'GET':
-			r = requests.get(url, params=params, stream=True)
+			r = requests.get(url, params=params, stream=True, headers=COOKIE)
 		else:
 			print('Invalid HTTP method')
 			return None
