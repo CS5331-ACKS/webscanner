@@ -45,9 +45,10 @@ CONFIG_REDIR_WAIT = 6
 
 COOKIE_HTTP_HEADER = {'Cookie': 'testcookie'}
 
-CONFIG_SQLI_SLEEP_TIME = 3
+CONFIG_SQLI_SLEEP_TIME = 5
 
 SQLI_PROBES = [
+	"(select*from(select(sleep(%d)))a)" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR SLEEP(%d);#" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR SLEEP(%d);--" % CONFIG_SQLI_SLEEP_TIME,
 	"' OR sleep(%d);#" % CONFIG_SQLI_SLEEP_TIME,
