@@ -75,12 +75,6 @@ with open('vulnScanScripts/commandInjPayloads.txt') as f:
 with open('vulnScanScripts/serverSidePayloads.txt') as f:
 	serverInjectList = list(f)
 
-with open('vulnScanScripts/serverSideExploitPayloads.txt') as f:
-	serverInjectExploitList = list(f)
-
-with open('vulnScanScripts/sqlExploitPayloads.txt') as f:
-	sqlExploitList = list(f)
-
 # Data structure to hold the results
 RESULT_KEY_SQLI = "SQL Injection"
 RESULT_KEY_SSCI = "Server Side Code Injection"
