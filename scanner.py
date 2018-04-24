@@ -4,15 +4,46 @@ import difflib
 import json
 import os
 import requests
+import sys
+import time
 from copy import deepcopy
 from requests import Request, Session
 from pprint import pprint
 from urlparse import urlparse
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
+# Data structure to hold the results
+RESULT_KEY_SQLI = "SQL Injection"
+RESULT_KEY_SSCI = "Server Side Code Injection"
+RESULT_KEY_DIR = "Directory Traversal"
+RESULT_KEY_REDIR = "Open Redirect"
+RESULT_KEY_CSRF = "CSRF"
+RESULT_KEY_CMD = "Command Injection"
+RESULT_KEYS = [
+	RESULT_KEY_SQLI,
+	RESULT_KEY_SSCI,
+	RESULT_KEY_DIR,
+	RESULT_KEY_REDIR,
+	RESULT_KEY_CSRF,
+	RESULT_KEY_CMD
+]
+RESULTS = {result_key: {"class": result_key, "results": {}} for result_key in RESULT_KEYS}
 
 ### Scanner configuration and probes ###
+CONFIG_TO_SCAN = {
+	RESULT_KEY_SQLI: False,
+	RESULT_KEY_SSCI: False,
+	RESULT_KEY_DIR: False,
+	RESULT_KEY_REDIR: True,
+	RESULT_KEY_CSRF: False,
+	RESULT_KEY_CMD: False
+}
 
-cookie_data = open('cookie.txt', 'r').read().strip()
-COOKIE_HTTP_HEADER = {'Cookie': cookie_data}
+CONFIG_USE_FIREFOX = True
+CONFIG_REDIR_WAIT = 6
+
+COOKIE_HTTP_HEADER = {'Cookie': 'testcookie'}
 
 CONFIG_SQLI_SLEEP_TIME = 3
 
@@ -76,23 +107,6 @@ with open('vulnScanScripts/commandInjPayloads.txt') as f:
 with open('vulnScanScripts/serverSidePayloads.txt') as f:
 	serverInjectList = list(f)
 
-# Data structure to hold the results
-RESULT_KEY_SQLI = "SQL Injection"
-RESULT_KEY_SSCI = "Server Side Code Injection"
-RESULT_KEY_DIR = "Directory Traversal"
-RESULT_KEY_REDIR = "Open Redirect"
-RESULT_KEY_CSRF = "CSRF"
-RESULT_KEY_CMD = "Command Injection"
-RESULT_KEYS = [
-	RESULT_KEY_SQLI,
-	RESULT_KEY_SSCI,
-	RESULT_KEY_DIR,
-	RESULT_KEY_REDIR,
-	RESULT_KEY_CSRF,
-	RESULT_KEY_CMD
-]
-RESULTS = {result_key: {"class": result_key, "results": {}} for result_key in RESULT_KEYS}
-
 session = Session()
 
 def scan(url, params):
@@ -108,102 +122,105 @@ def scan(url, params):
 
 	# CSRF
 	# ====
-	print("\n[*] Scanning for CSRF vulnerablities")
-	for method in params.keys():
-		method_params = params[method]
-		auth_response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
-		unauth_response = make_request(method, url, method_params, {'Referer': 'https://www.google.com'})
-		# This checks for the case where the CSRF token is a secret cookie (bad implementation)
-		if auth_response.content == unauth_response.content:
-			print("[!] Authenticated and unauthenticated request produces identical responses")
-			print("[*] Note: Ignore unauthenticated only requests as this test case produces false positives")
-			add_result(RESULT_KEY_CSRF, hostname, endpoint, method_params, method)
+	if CONFIG_TO_SCAN[RESULT_KEY_CSRF]:
+		print("\n[*] Scanning for CSRF vulnerablities")
+		for method in params.keys():
+			method_params = params[method]
+			auth_response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
+			unauth_response = make_request(method, url, method_params, {'Referer': 'https://www.google.com'})
+			# This checks for the case where the CSRF token is a secret cookie (bad implementation)
+			if auth_response.content == unauth_response.content:
+				print("[!] Authenticated and unauthenticated request produces identical responses")
+				print("[*] Note: Ignore unauthenticated only requests as this test case produces false positives")
+				add_result(RESULT_KEY_CSRF, hostname, endpoint, method_params, method)
 
-		# This checks for the case where the CSRF token is a hidden form input
-		params_copy = deepcopy(method_params)
-		deleted_params = []
-		for param, value in params_copy.items():
-			if get_input_type(url, param) == "hidden":
-				deleted_params.append({param: value})
-				del params_copy[param]
-		if deleted_params:
-			nohidden_response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
-			if auth_response.content != nohidden_response.content:
-				print("[!] CSRF could have been implemented as a hidden input value")
-				print("[*] Removed hidden params:")
-				pprint(deleted_params)
+			# This checks for the case where the CSRF token is a hidden form input
+			params_copy = deepcopy(method_params)
+			deleted_params = []
+			for param, value in params_copy.items():
+				if get_input_type(url, param) == "hidden":
+					deleted_params.append({param: value})
+					del params_copy[param]
+			if deleted_params:
+				nohidden_response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
+				if auth_response.content != nohidden_response.content:
+					print("[!] CSRF could have been implemented as a hidden input value")
+					print("[*] Removed hidden params:")
+					pprint(deleted_params)
 
 	# Command Injection
 	# =================
-	print("\n[*] Scanning for command injection vulnerabilities")
-	for method in params.keys():
-		method_params = params[method]
-		vulnerable = False
-		for param in method_params.keys():
-			params_copy = deepcopy(method_params)
-			response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
-			initial_length = int(response.headers['content-length'])
-			print("[*] Initial response content length: %d" % initial_length)
+	if CONFIG_TO_SCAN[RESULT_KEY_CMD]:
+		print("\n[*] Scanning for command injection vulnerabilities")
+		for method in params.keys():
+			method_params = params[method]
+			vulnerable = False
+			for param in method_params.keys():
+				params_copy = deepcopy(method_params)
+				response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
+				initial_length = int(response.headers['content-length'])
+				print("[*] Initial response content length: %d" % initial_length)
 
-			# Scan for potential command injection vulns
-			for x in commandExecList:
-				params_copy[param] = x.strip()
-				response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
-				delta = int(response.headers['content-length']) - initial_length
+				# Scan for potential command injection vulns
+				for x in commandExecList:
+					params_copy[param] = x.strip()
+					response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
+					delta = int(response.headers['content-length']) - initial_length
 
-				# Search for specific echo string 'gaw4f4sdaf12f', output of passwd or id command.
-				if 'gaw4f4sdaf12f' in response.content or \
-					'root:x:0:0' in response.content or \
-					'/bin' in response.content or \
-					'uid=' in response.content:
-					print("[!] Module is potentially vulnerable to command injection!")
-					print("[*] Payload used: %s" % params_copy)
-					print("[*] Elasped Time: %d" % response.elapsed.total_seconds())
-					print("[*] Response content length: %s" % response.headers['content-length'])
-					add_result(RESULT_KEY_CMD, hostname, endpoint, params_copy, method)
-					vulnerable = True
+					# Search for specific echo string 'gaw4f4sdaf12f', output of passwd or id command.
+					if 'gaw4f4sdaf12f' in response.content or \
+						'root:x:0:0' in response.content or \
+						'/bin' in response.content or \
+						'uid=' in response.content:
+						print("[!] Module is potentially vulnerable to command injection!")
+						print("[*] Payload used: %s" % params_copy)
+						print("[*] Elasped Time: %d" % response.elapsed.total_seconds())
+						print("[*] Response content length: %s" % response.headers['content-length'])
+						add_result(RESULT_KEY_CMD, hostname, endpoint, params_copy, method)
+						vulnerable = True
+						break
+
+					# sleep command is for 10 seconds
+					elif response.elapsed.total_seconds() > 10:
+						print("[*] Module is potentially vulnerable to blind command injection!")
+						print("[*] Payload used: %s" % params_copy)
+						print("[*] Elasped Time: %d" % response.elapsed.total_seconds())
+						print("[*] Response content length: %s" % response.headers['content-length'])
+						add_result(RESULT_KEY_CMD, hostname, endpoint, params_copy, method)
+						vulnerable = True
+						break
+
+				if vulnerable:
 					break
-
-				# sleep command is for 10 seconds
-				elif response.elapsed.total_seconds() > 10:
-					print("[*] Module is potentially vulnerable to blind command injection!")
-					print("[*] Payload used: %s" % params_copy)
-					print("[*] Elasped Time: %d" % response.elapsed.total_seconds())
-					print("[*] Response content length: %s" % response.headers['content-length'])
-					add_result(RESULT_KEY_CMD, hostname, endpoint, params_copy, method)
-					vulnerable = True
-					break
-
-			if vulnerable:
-				break
 
 	# Server Side Injection
 	# =====================
 	# 1. LFI, RFI has the same capabilities, we include itself will cause the response to baloon
 	#    We try the file name with or without .php extension, and 0 to 2 levels higher in the FS
 	# 2. PHP code exec is hard to say exactly
-	print("\n[*] Scanning for Server Side Command Injection vulnerabilities")
-	for method in params.keys():
-		method_params = params[method]
-		vulnerable = False
-		for param in method_params.keys():
-			params_copy = deepcopy(method_params)
-			response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
-			initial_length = len(response.content)
-			print("[*] Initial response content length: %d" % initial_length)
+	if CONFIG_TO_SCAN[RESULT_KEY_SSCI]:
+		print("\n[*] Scanning for Server Side Command Injection vulnerabilities")
+		for method in params.keys():
+			method_params = params[method]
+			vulnerable = False
+			for param in method_params.keys():
+				params_copy = deepcopy(method_params)
+				response = make_auth_request(method, url, method_params, COOKIE_HTTP_HEADER)
+				initial_length = len(response.content)
+				print("[*] Initial response content length: %d" % initial_length)
 
-			# Scan for LFI/RFI
-			for probe in SSCI_PROBES:
-				params_copy[param] = probe % filename.split('.')[0]
-				response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
-				if len(response.content) > 5 * initial_length:
-					print("[!] Highly likely vulnerable to SSCI, massive response size due to self inclusion: %d" % len(response.content))
-					add_result(RESULT_KEY_SSCI, hostname, endpoint, params_copy, method)
-					vulnerable = True
+				# Scan for LFI/RFI
+				for probe in SSCI_PROBES:
+					params_copy[param] = probe % filename.split('.')[0]
+					response = make_auth_request(method, url, params_copy, COOKIE_HTTP_HEADER)
+					if len(response.content) > 5 * initial_length:
+						print("[!] Highly likely vulnerable to SSCI, massive response size due to self inclusion: %d" % len(response.content))
+						add_result(RESULT_KEY_SSCI, hostname, endpoint, params_copy, method)
+						vulnerable = True
+						break
+
+				if vulnerable:
 					break
-
-			if vulnerable:
-				break
 
 	# for method in params.keys():
 	# 		method_params = params[method]
@@ -245,18 +262,34 @@ def scan(url, params):
 	# Check for open redirects
 	# ========================
 	# 1. Parameter value is contained in redirected URL
-	print("\n[*] Scanning for open redirect vulnerabilities")
-	for method in params.keys():
-		method_params = params[method]
-		response = make_request(method, url, method_params)
-		for history_response in response.history:
-			if 300 <= history_response.status_code < 400:
-				print("[!] Request history contains redirect: %s (%d)" % (history_response.url, history_response.status_code))
-		for param, value in method_params.items():
-			parsed_url = urlparse(response.url)
-			if parsed_url.path.endswith(str(value)):
-				print("[!] Redirected URL path ends with parameter value (%s=%s)" % (param, value))
-				add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
+	if CONFIG_TO_SCAN[RESULT_KEY_REDIR]:
+		print("\n[*] Scanning for open redirect vulnerabilities")
+		for method in params.keys():
+			method_params = params[method]
+			response = make_request(method, url, method_params)
+			request_url = response.request.url
+			for history_response in response.history:
+				if 300 <= history_response.status_code < 400:
+					print("[!] Request history contains redirect: %s (%d)" % (history_response.url, history_response.status_code))
+			for param, value in method_params.items():
+				parsed_url = urlparse(response.url)
+				if parsed_url.path.endswith(str(value)):
+					print("[!] Redirected URL path ends with parameter value (%s=%s)" % (param, value))
+					add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
+
+			if CONFIG_USE_FIREFOX:
+				print("[*] Using Firefox to detect open redirects")
+				options = Options()
+				options.set_headless(headless=True)
+				firefox = webdriver.Firefox(firefox_options=options)
+				firefox.get(request_url)
+				print("[*] Waiting for preconfigured time: %ds" % CONFIG_REDIR_WAIT)
+				time.sleep(CONFIG_REDIR_WAIT)
+				for param, value in method_params.items():
+					if value in firefox.current_url:
+						print("[!] Redirected URL path contains parameter value (%s=%s)" % (param, value))
+						add_result(RESULT_KEY_REDIR, hostname, endpoint, method_params, method)
+				firefox.quit()
 
 	# Check for unsanitized inputs
 	# ============================
@@ -284,7 +317,7 @@ def scan(url, params):
 			print("[*] Delta line count: %d" % count)
 			prev_html = response.content
 
-		if first_delta:
+		if first_delta and CONFIG_TO_SCAN[RESULT_KEY_DIR]:
 			print("[*] Non-zero first delta, trying directory traversal probes")
 			vulnerable = False
 			for param in method_params.keys():
@@ -300,27 +333,28 @@ def scan(url, params):
 				if vulnerable:
 					break
 
-		print("[*] Scanning for SQLi vulnerablities")
-		for param in method_params.keys():
-			params_copy = deepcopy(method_params)
-			vulnerable = False
-			for probe in SQLI_PROBES:
-				params_copy[param] = probe
-				response = make_request(method, url, params_copy)
-				delta_lines = sum(1 for _ in difflib.context_diff(prev_html, response.content))
-				if "SLEEP" in probe or "sleep" in probe:
-					if response.elapsed.total_seconds() > CONFIG_SQLI_SLEEP_TIME:
-						print("[!] Highly possible SQLi, probe triggered server sleep using parameter value (%s=%s)" % (param, probe))
+		if CONFIG_TO_SCAN[RESULT_KEY_SQLI]:
+			print("[*] Scanning for SQLi vulnerablities")
+			for param in method_params.keys():
+				params_copy = deepcopy(method_params)
+				vulnerable = False
+				for probe in SQLI_PROBES:
+					params_copy[param] = probe
+					response = make_request(method, url, params_copy)
+					delta_lines = sum(1 for _ in difflib.context_diff(prev_html, response.content))
+					if "SLEEP" in probe or "sleep" in probe:
+						if response.elapsed.total_seconds() > CONFIG_SQLI_SLEEP_TIME:
+							print("[!] Highly possible SQLi, probe triggered server sleep using parameter value (%s=%s)" % (param, probe))
+							add_result(RESULT_KEY_SQLI, hostname, endpoint, params_copy, method)
+							vulnerable = True
+							break
+					if delta_lines > 5:
+						print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
 						add_result(RESULT_KEY_SQLI, hostname, endpoint, params_copy, method)
 						vulnerable = True
 						break
-				if delta_lines > 5:
-					print("[!] Possible SQLi, probe triggered large response delta using parameter value (%s=%s)" % (param, probe))
-					add_result(RESULT_KEY_SQLI, hostname, endpoint, params_copy, method)
-					vulnerable = True
+				if vulnerable:
 					break
-			if vulnerable:
-				break
 
 def make_request(method, url, params, headers={}):
 	if method == 'POST':
@@ -360,14 +394,17 @@ def add_result(result_key, hostname, endpoint, params, method):
 	})
 
 if __name__ == '__main__':
-	with open('logs/scan_data.json', 'r') as file:
-		scan_data_list = json.loads(file.read())
-		for scan_data in scan_data_list:
-			scan(scan_data['url'], scan_data['params'])
+	if len(sys.argv) != 2:
+		print("Usage: %s <JSON File>" % sys.argv[0])
+	else:
+		with open(sys.argv[1], 'r') as file:
+			scan_data_list = json.loads(file.read())
+			for scan_data in scan_data_list:
+				scan(scan_data['url'], scan_data['params'])
 
-	print('\nScan Results')
-	print('============')
-	pprint(RESULTS)
+		print('\nScan Results')
+		print('============')
+		pprint(RESULTS)
 
-	with open('logs/scan_results.json', 'w') as file:
-		file.write(json.dumps(RESULTS, indent=2, separators=(',', ': ')))
+		with open('logs/scan_results.json', 'w') as file:
+			file.write(json.dumps(RESULTS, indent=2, separators=(',', ': ')))
