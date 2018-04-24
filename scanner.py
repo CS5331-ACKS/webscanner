@@ -75,12 +75,6 @@ with open('vulnScanScripts/commandInjPayloads.txt') as f:
 with open('vulnScanScripts/serverSidePayloads.txt') as f:
 	serverInjectList = list(f)
 
-with open('vulnScanScripts/commandInjExploitPayloads.txt') as f:
-	commandExecExploitList = list(f)
-
-with open('vulnScanScripts/commandInjExploitRevShellPayloads.txt') as f:
-	commandExecExploitRevShellList = list(f)
-
 with open('vulnScanScripts/serverSideExploitPayloads.txt') as f:
 	serverInjectExploitList = list(f)
 
